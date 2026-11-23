@@ -15,6 +15,8 @@ import org.json.*;
 public class MainActivity extends Activity {
     private WebView engine, screen;
     private ServerSocket listener;
+    private PermissionRequest cameraRequest;
+    private ValueCallback<android.net.Uri[]> photoCallback;
     private final ThreadPoolExecutor workers = new ThreadPoolExecutor(4, 12, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(40));
     private static final int PORT = 8787;
 
@@ -40,7 +42,38 @@ public class MainActivity extends Activity {
         screen.getSettings().setAllowFileAccess(false);
         screen.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView w, WebResourceRequest r){
-                return !"127.0.0.1".equals(r.getUrl().getHost()) || r.getUrl().getPort()!=PORT;
+                android.net.Uri u=r.getUrl();
+                if("http".equals(u.getScheme()) && "127.0.0.1".equals(u.getHost()) && u.getPort()==PORT)return false;
+                String code=u.getQueryParameter("room");
+                if(r.isForMainFrame() && "http".equals(u.getScheme()) && "/".equals(u.getPath()) &&
+                    code!=null && code.matches("[0-9A-Fa-f]{6}") && u.getHost()!=null &&
+                    u.getHost().matches("(10\\..*|192\\.168\\..*|172\\.(1[6-9]|2[0-9]|3[01])\\..*|[a-zA-Z0-9.-]+\\.local)")){
+                    startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,u));
+                }
+                return true;
+            }
+        });
+        screen.setWebChromeClient(new WebChromeClient(){
+            @Override public void onPermissionRequest(PermissionRequest request){
+                if(!("http://127.0.0.1:"+PORT).equals(request.getOrigin().toString().replaceAll("/$",""))
+                        || !Arrays.asList(request.getResources()).contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE)){
+                    request.deny();return;
+                }
+                if(checkSelfPermission(android.Manifest.permission.CAMERA)==android.content.pm.PackageManager.PERMISSION_GRANTED){
+                    request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                }else{
+                    cameraRequest=request;
+                    requestPermissions(new String[]{android.Manifest.permission.CAMERA},71);
+                }
+            }
+            @Override public void onPermissionRequestCanceled(PermissionRequest r){if(r==cameraRequest)cameraRequest=null;}
+            @Override public boolean onShowFileChooser(WebView view,ValueCallback<android.net.Uri[]> cb,FileChooserParams params){
+                if(photoCallback!=null)photoCallback.onReceiveValue(null);
+                photoCallback=cb;
+                android.content.Intent picker=new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                picker.setType("image/*");picker.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+                try{startActivityForResult(picker,72);}catch(android.content.ActivityNotFoundException e){cb.onReceiveValue(null);photoCallback=null;}
+                return true;
             }
         });
         engine.setWebViewClient(new WebViewClient(){
@@ -49,6 +82,22 @@ public class MainActivity extends Activity {
             }
         });
         engine.loadUrl("file:///android_asset/host.html");
+    }
+    @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] results){
+        super.onRequestPermissionsResult(code,permissions,results);
+        if(code==71 && cameraRequest!=null){
+            if(results.length>0 && results[0]==android.content.pm.PackageManager.PERMISSION_GRANTED)
+                cameraRequest.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+            else cameraRequest.deny();
+            cameraRequest=null;
+        }
+    }
+    @Override protected void onActivityResult(int request,int result,android.content.Intent data){
+        super.onActivityResult(request,result,data);
+        if(request==72 && photoCallback!=null){
+            photoCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result,data));
+            photoCallback=null;
+        }
     }
     private void listen(){
         try(ServerSocket socket=new ServerSocket()){
