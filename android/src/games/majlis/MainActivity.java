@@ -150,13 +150,13 @@ public class MainActivity extends Activity {
                 if(action.equals("network"))result=new JSONObject().put("urls",addresses()).toString();
                 else result=dispatch(action,new String(body,StandardCharsets.UTF_8));
                 reply(socket,new JSONObject(result).has("error")?400:200,"application/json",result.getBytes(StandardCharsets.UTF_8));
-            }else if(first[0].equals("GET") && (path.equals("/") || path.matches("/[A-Za-z0-9_-]+\\.(js|html|css|png|webp|ttf)"))){
+            }else if(first[0].equals("GET") && (path.equals("/") || path.matches("/[A-Za-z0-9_-]+\\.(js|html|css|jpg|png|webp|ttf)"))){
                 String file=path.equals("/")?"index.html":path.substring(1);
                 try(InputStream asset=getAssets().open("public/"+file)){
                     ByteArrayOutputStream out=new ByteArrayOutputStream();
                     byte[] buf=new byte[16384];int n;
                     while((n=asset.read(buf))!=-1)out.write(buf,0,n);
-                    String type=file.endsWith(".js")?"text/javascript":file.endsWith(".css")?"text/css":file.endsWith(".png")?"image/png":file.endsWith(".ttf")?"font/ttf":"text/html";
+                    String type=file.endsWith(".js")?"text/javascript":file.endsWith(".css")?"text/css":file.endsWith(".jpg")?"image/jpeg":file.endsWith(".png")?"image/png":file.endsWith(".ttf")?"font/ttf":"text/html";
                     reply(socket,200,type,out.toByteArray());
                 }
             }else reply(socket,404,"text/plain",new byte[0]);

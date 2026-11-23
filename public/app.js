@@ -20,13 +20,13 @@ function notify(msg){$('toast').textContent=msg;clearTimeout(notify.timer);notif
 function guide(n){
   show('<h2>'+guides[n][0]+'</h2><div class="guideTabs">'+guides.map((g,i)=>'<button class="light '+(i===n?'on':'')+'" data-guide="'+i+'">'+g[0]+'</button>').join('')+'</div><p>'+guides[n][1]+'</p>');
 }
-function form(join=false) {
+function form(join=false,kind="jackaroo") {
   if(session && (!invited || invited===session.code))return resume();
-  show('<h2>'+(join?'انضم إلى طاولة':'إنشاء طاولة')+'</h2><form id="entry"><label class="field">اسم اللاعب<input name="name" required maxlength="24" autocomplete="nickname"></label>'+(join?'<label class="field">رمز الطاولة<input dir="ltr" name="code" required maxlength="6" minlength="6" pattern="[a-fA-F0-9]{6}" value="'+esc(invited||'')+'"></label><button type="button" class="light" id="scanInvite">مسح رمز الدعوة</button>':'<label class="field">عدد اللاعبين<select name="capacity"><option value="4">أربعة لاعبين · فريقان</option><option value="6">ستة لاعبين · ثلاثة فرق</option></select></label>')+'<p class="hint">اتصلوا بشبكة واي فاي واحدة أو بنقطة اتصال المضيف.</p><p class="err" role="alert"></p><button class="solid">'+(join?'تأكيد الانضمام':'افتح الطاولة')+'</button></form>');
+  show('<h2>'+(join?'انضم إلى طاولة':('طاولة '+(kind==='mercy'?'أونو لا ترحم':'جاكارو')))+'</h2><form id="entry"><label class="field">اسم اللاعب<input name="name" required maxlength="24" autocomplete="nickname"></label>'+(join?'<label class="field">رمز الطاولة<input dir="ltr" name="code" required maxlength="6" minlength="6" pattern="[a-fA-F0-9]{6}" value="'+esc(invited||'')+'"></label><button type="button" class="light" id="scanInvite">مسح رمز الدعوة</button>':'<label class="field">عدد اللاعبين<select name="capacity">'+(kind==='mercy'?[2,3,4,5,6].map(n=>'<option value="'+n+'">'+n+' لاعبين</option>').join(''):'<option value="4">أربعة لاعبين · فريقان</option><option value="6">ستة لاعبين · ثلاثة فرق</option>')+'</select></label>')+'<p class="hint">اتصلوا بشبكة واي فاي واحدة أو بنقطة اتصال المضيف.</p><p class="err" role="alert"></p><button class="solid">'+(join?'تأكيد الانضمام':'افتح الطاولة')+'</button></form>');
   if($('scanInvite'))$('scanInvite').onclick=openScanner;
   $('entry').onsubmit=async e=>{
     e.preventDefault();const f=e.target;f.querySelector('button.solid').disabled=true;
-    try{const data=Object.fromEntries(new FormData(f));if(data.capacity)data.capacity=Number(data.capacity);if(data.code)data.code=data.code.toUpperCase();
+    try{const data=Object.fromEntries(new FormData(f));if(data.capacity){data.capacity=Number(data.capacity);data.kind=kind;}if(data.code)data.code=data.code.toUpperCase();
       session=await api(join?'join':'create',data);localStorage.setItem(storage,JSON.stringify(session));
       history.replaceState(null,'','/');modal.close();snapshot=null;await resume();
     }catch(err){f.querySelector('.err').textContent=err.message;}finally{f.querySelector('button.solid').disabled=false;}
@@ -44,16 +44,20 @@ async function refresh(force=false){
     notify(err.message);
   }
 }
-function home(){showingRoom=false;$('room').hidden=true;$('landing').hidden=false;$('create').firstChild.textContent=session?'العودة إلى طاولتي ':'إنشاء طاولة ';}
+function home(){showingRoom=false;$('room').hidden=true;$('landing').hidden=false;for(const [id,label] of [['create','العب جاكارو'],['mercyCreate','العب أونو']])$(id).firstChild.textContent=session?'العودة إلى طاولتي ':label+' ';}
 function seats(s){
+  if(s.kind==='mercy')return '<ul class="seats">'+Array.from({length:s.capacity},(_,i)=>'<li><span class="seatNo">'+(i+1)+'</span><strong>'+esc(s.players[i]||'مقعد شاغر')+'</strong>'+(i===s.seat?' · أنت':'')+'</li>').join('')+'</ul>';
   return '<ul class="seats">'+colors.slice(0,s.capacity).map((color,i)=>'<li><b class="dot s'+i+'"></b><strong>'+esc(s.players[i]||'مقعد شاغر')+'</strong> · '+color+' · فريق '+(1+i%(s.capacity/2))+(i===s.seat?' (أنت)':'')+(s.game?.turn===i && s.game.winner===null?' ◂ عليه الدور':'')+'</li>').join('')+'</ul>';
 }
 function render(){
   const s=snapshot,g=s.game;
   $('landing').hidden=true;$('room').hidden=false;
-  let html='<div class="roomHead"><div><div class="eyebrow dark">طاولة '+esc(s.code)+'</div><h2>جاكارو المجلس</h2></div><button class="light" data-guide="1">دليل الأوراق</button></div>';
+  const mercy=s.kind==='mercy';
+  let html='<div class="roomHead"><div><div class="eyebrow dark">طاولة '+esc(s.code)+'</div><h2>'+(mercy?'أونو لا ترحم':'جاكارو المجلس')+'</h2></div><button class="light" '+(mercy?'data-mercy-guide':'data-guide="1"')+'>دليل الأوراق</button></div>';
   if(!g){
-    html+='<div class="lobby"><h2>مقاعد الطاولة</h2><p>'+s.players.length+' من '+s.capacity+' لاعبين · يجلس الشريكان متقابلين</p>'+seats(s)+'<div class="inviteBox" id="inviteBox"><img id="inviteQR" alt="رمز الانضمام إلى الطاولة"><div><h3>امسح للانضمام</h3><p class="hint">افتح كاميرا هاتفك على الشبكة نفسها.</p><code>'+s.code+'</code></div></div><label class="field">رابط الدعوة<input id="inviteLink" readonly value="'+esc(invite+'/?room='+s.code)+'"></label><div class="actions"><button class="light" id="copy">نسخ الرابط</button>'+(s.seat===0?'<button class="solid" id="start" '+(s.players.length!==s.capacity?'disabled':'')+'>بدء المباراة</button>':'')+'</div></div>';
+    html+='<div class="lobby"><h2>مقاعد الطاولة</h2><p>'+s.players.length+' من '+s.capacity+' لاعبين'+(mercy?' · لعب فردي':' · يجلس الشريكان متقابلين')+'</p>'+seats(s)+'<div class="inviteBox" id="inviteBox"><img id="inviteQR" alt="رمز الانضمام إلى الطاولة"><div><h3>امسح للانضمام</h3><p class="hint">افتح كاميرا هاتفك على الشبكة نفسها.</p><code>'+s.code+'</code></div></div><label class="field">رابط الدعوة<input id="inviteLink" readonly value="'+esc(invite+'/?room='+s.code)+'"></label><div class="actions"><button class="light" id="copy">نسخ الرابط</button>'+(s.seat===0?'<button class="solid" id="start" '+(s.players.length!==s.capacity?'disabled':'')+'>بدء المباراة</button>':'')+'</div></div>';
+  } else if(mercy){
+    html+=mercyTable(s);
   } else {
     selected=g.moves.findIndex(m=>m.length);
     html+='<div class="arena"><canvas class="board" id="board" aria-label="لوحة جاكارو"></canvas><section class="panel"><div class="eyebrow dark">توزيعة '+g.round+' · '+colors[s.seat]+'</div><h2>'+(g.winner!==null?'فوز '+colors[g.winner]+' و'+colors[TableRules.partner(g.winner,s.capacity)]:g.turn===s.seat?'حان دورك':'دور '+esc(s.players[g.turn]))+'</h2><h3>أوراقك</h3><div class="hand">'+g.hand.map((card,i)=>'<button data-card="'+i+'" class="card '+(/[♦♥]/.test(card)?'red':'')+'" '+(!g.moves[i]?.length?'disabled':'')+'>'+card.slice(0,-1)+'<span>'+card.slice(-1)+'</span></button>').join('')+'</div><div id="moves"></div>'+(g.winner!==null && s.seat===0?'<button id="start" class="solid">مباراة جديدة</button>':'')+'<hr>'+seats(s)+(g.last?'<p class="hint">آخر حركة · '+esc(s.players[g.last.seat])+' · '+g.last.card+' · '+esc(g.last.label)+'</p>':'')+'</section></div>';
@@ -82,7 +86,7 @@ function render(){
   }
   if($('copy'))$('copy').onclick=async()=>{const inp=$('inviteLink');inp.select();try{await navigator.clipboard.writeText(inp.value);notify('نُسخ الرابط');}catch{notify(document.execCommand('copy')?'نُسخ الرابط':'حدّد الرابط وانسخه');}};
   if($('start'))$('start').onclick=()=>act('start');
-  if(g)displayMoves();
+  if(g&&!mercy)displayMoves();
 }
 function displayMoves(){
   const g=snapshot.game, moves=g.moves[selected]||[];
@@ -108,10 +112,12 @@ async function act(action,data={}){
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
+ if(b.hasAttribute('data-mercy-guide'))mercyGuide();
  if(b.dataset.guide!==undefined)guide(Number(b.dataset.guide));
  if(b.dataset.card!==undefined){selected=Number(b.dataset.card);displayMoves();}
 });
-$('create').onclick=()=>form();$('join').onclick=()=>form(true);$('home').onclick=home;
+$('guideMenu').onclick=()=>{if(showingRoom&&snapshot)return snapshot.kind==='mercy'?mercyGuide():guide(0);show('<h2>دليل اللعب</h2><div class="actions"><button class="solid" data-mercy-guide>أونو لا ترحم</button><button class="light" data-guide="0">جاكارو</button></div>');};
+$('mercyCreate').onclick=()=>form(false,'mercy');$('create').onclick=()=>form();$('join').onclick=()=>form(true);$('home').onclick=home;
 document.querySelector('.close').onclick=()=>modal.close();
 $('network').onclick=()=>show('<h2>الشبكة المحلية</h2><p>فعّل نقطة اتصال الهاتف المضيف أو اتصلوا بشبكة واي فاي واحدة. افتح الطاولة ثم شارك رابط الدعوة مع بقية اللاعبين. أبقِ المضيف مفتوحًا طوال المباراة.</p><p dir="ltr">'+esc(invite||location.origin)+'</p>');
 (async()=>{let urls=[];try{urls=(await api('network')).urls;addresses=urls;}catch{}

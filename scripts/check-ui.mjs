@@ -46,11 +46,11 @@ async function page(width){
   }
   return {evaluate,wait,visit,capture,checkTypeface};
 }
-const timer=setTimeout(()=>{proc.kill();process.exit(1);},60000);
+const timer=setTimeout(()=>{proc.kill();process.exit(1);},180000);
 try{
   for(const capacity of [4,6]){
   const host=await page(1365);await host.visit(url);await host.evaluate('document.fonts.ready.then(()=>true)');
-  await host.checkTypeface('.hero h1','Alexandria');
+  await host.checkTypeface('.collection h2','Alexandria');
   await host.checkTypeface('.heroCopy p','Tajawal');
   await host.checkTypeface('#create','Tajawal');
   await host.capture('lounge.png');
@@ -92,7 +92,43 @@ try{
   assert.equal(await guests[0].evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   await guests[0].visit(url);await guests[0].wait('!!document.querySelector("#play")');
   }
+  const rivals=[await page(1365),await page(390)];
+  const [dealer,guest]=rivals;
+  await dealer.visit(url);
+  await dealer.evaluate("document.querySelector('#mercyCreate').click();document.querySelector('[name=name]').value='ليلى';document.querySelector('[name=capacity]').value='2';document.querySelector('#entry').requestSubmit()");
+  await dealer.wait("!!document.querySelector('#inviteLink')");
+  await guest.visit(await dealer.evaluate("document.querySelector('#inviteLink').value"));
+  await guest.evaluate("document.querySelector('[name=name]').value='فارس';document.querySelector('#entry').requestSubmit()");
+  await dealer.wait("!document.querySelector('#start').disabled");await dealer.evaluate("document.querySelector('#start').click()");
+  for(const player of rivals)await player.wait("!!document.querySelector('.mercyArena')");
+  await dealer.capture('mercy-table.png');await guest.capture('mercy-mobile.png');
+  let winner=null;
+  for(let turn=0;turn<1500;turn++){
+    await dealer.evaluate("refresh(true)");
+    const state=await dealer.evaluate("({turn:snapshot.game.turn,winner:snapshot.game.winner,rev:snapshot.rev})");
+    winner=state.winner;if(winner!==null)break;
+    const player=rivals[state.turn];await player.evaluate("refresh(true)");
+    await player.evaluate(`(()=>{
+      const playable=document.querySelector('.handCard:not(:disabled)');
+      if(playable){
+        playable.click();
+        const color=document.querySelector('#mercyChoice [name=color]');if(color)color.checked=true;
+        const call=document.querySelector('.callCheck input');if(call)call.checked=true;
+        document.querySelector('#mercyChoice').requestSubmit();
+      }else{
+        document.querySelector('[data-mercy-draw]').click();
+        const form=document.querySelector('#roulettePick');
+        if(form){form.querySelector('input').checked=true;form.requestSubmit();}
+      }
+    })()`);
+    await player.wait('snapshot.rev>'+state.rev);
+  }
+  assert.notEqual(winner,null);
+  await dealer.evaluate("document.querySelector('#start').click()");
+  await dealer.wait('snapshot.game.winner===null && snapshot.game.hand.length===7');
+  await guest.visit(url);await guest.wait("!!document.querySelector('.handCard')");
+  assert.equal(await guest.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   const mobile=await page(390);await mobile.visit(url);await mobile.capture('mobile-lounge.png');
   assert.equal(await mobile.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
-  console.log('Verified both table sizes, fonts, QR decoding, guest turns, reconnect and mobile layout.');
+  console.log('Verified Jackaroo 4/6, No Mercy end-to-end game, rematch, reconnect, QR, fonts and mobile layout.');
 }finally{clearTimeout(timer);proc.kill();await new Promise(r=>proc.once('exit',r));await rm(profile,{recursive:true,force:true});}
