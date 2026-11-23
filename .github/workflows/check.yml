@@ -11,3 +11,5 @@ jobs:
         with:
           node-version: '22'
       - run: node --test test/*.test.mjs
+      - run: npm ci
+      - run: npm run build

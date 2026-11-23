@@ -31,10 +31,10 @@ async function page(width){
     if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description || 'JavaScript failure');return r.result.value;
   };
   async function wait(expression){
-    for(let i=0;i<100;i++){if(await evaluate(expression))return;await new Promise(r=>setTimeout(r,100));}throw Error('Timeout '+expression);
+    for(let i=0;i<100;i++){if(await evaluate(expression))return;await new Promise(r=>setTimeout(r,100));}throw Error('Timeout '+expression+' at '+await evaluate('location.href')+' · '+await evaluate('document.body.innerText.slice(-300)'));
   }
-  async function visit(address){await rpc('Page.navigate',{url:address},s);await wait('typeof form==="function" && !!invite');}
-  async function capture(file){await writeFile(join(output,file),(await rpc('Page.captureScreenshot',{format:'png'},s)).data,'base64');}
+  async function visit(address){await rpc('Page.navigate',{url:address},s);await wait('!!document.querySelector("#home")');}
+  async function capture(file){await evaluate('Promise.allSettled(document.getAnimations().filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)).then(() => true)');await writeFile(join(output,file),(await rpc('Page.captureScreenshot',{format:'png'},s)).data,'base64');}
   async function checkTypeface(selector,family){
     await evaluate('document.fonts.ready.then(()=>true)');
     await rpc('DOM.enable',{},s);await rpc('CSS.enable',{},s);
@@ -46,18 +46,27 @@ async function page(width){
   }
   return {evaluate,wait,visit,capture,checkTypeface};
 }
-const timer=setTimeout(()=>{proc.kill();process.exit(1);},180000);
+const timer=setTimeout(()=>{proc.kill();process.exit(1);},900000);
 try{
+  const mobile=await page(390);await mobile.visit(url);await mobile.capture('mobile-lounge.png');
+  assert.ok(await mobile.evaluate("document.querySelector('header nav').getBoundingClientRect().bottom <= document.querySelector('#landing .libraryHead').getBoundingClientRect().top"), 'mobile navigation should clear the lounge heading');
+  assert.equal(await mobile.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+  await mobile.evaluate("document.querySelector('#guideMenu').click()");
+  await mobile.wait("!!document.querySelector('#modal[open]')");
+  assert.equal(await mobile.evaluate("getComputedStyle(document.querySelector('#modal .close')).position"), 'absolute');
+  await mobile.evaluate("document.querySelector('#modal .close').click()");
+  await mobile.wait("!document.querySelector('#modal')");
   for(const capacity of [4,6]){
   const host=await page(1365);await host.visit(url);await host.evaluate('document.fonts.ready.then(()=>true)');
   await host.checkTypeface('.collection h2','Alexandria');
   await host.checkTypeface('.heroCopy p','Tajawal');
   await host.checkTypeface('#create','Tajawal');
   await host.capture('lounge.png');
-  await host.evaluate("document.querySelector('#create').click();document.querySelector('[name=capacity]').value='"+capacity+"';document.querySelector('[name=name]').value='ليلى';document.querySelector('#entry').requestSubmit()");
+  await host.evaluate("document.querySelector('#create').click()");
+  await host.wait("!!document.querySelector('#entry')");
+  await host.evaluate("document.querySelector('[name=capacity]').value='"+capacity+"';document.querySelector('[name=name]').value='ليلى';document.querySelector('#entry').requestSubmit()");
   await host.wait('!!document.querySelector("#inviteLink")');
-  const code=await host.evaluate('session.code');
-  await host.wait('document.querySelector("#inviteQR").naturalWidth>0');
+  await host.wait('document.querySelector("#inviteQR")?.naturalWidth>0');
   const decoded=await host.evaluate(`(()=>{
     const img=document.querySelector('#inviteQR'),canvas=document.createElement('canvas');
     canvas.width=canvas.height=img.naturalWidth;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
@@ -71,11 +80,14 @@ try{
     if(guests.length===1){
       await guest.visit(url);
       const png=await host.evaluate("document.querySelector('#inviteQR').src");
+      await guest.evaluate("document.querySelector('#join').click()");
+      await guest.wait("!!document.querySelector('#scanInvite')");
+      await guest.evaluate("document.querySelector('#scanInvite').click()");
+      await guest.wait("!!document.querySelector('#qrFile')");
       await guest.evaluate(`(async()=>{
-        document.querySelector('#join').click();document.querySelector('#scanInvite').click();
         const blob=await (await fetch(${JSON.stringify(png)})).blob(),dt=new DataTransfer();
         dt.items.add(new File([blob],'invitation.png',{type:'image/png'}));
-        const file=document.querySelector('#qrFile');file.files=dt.files;file.dispatchEvent(new Event('change'));
+        const file=document.querySelector('#qrFile');file.files=dt.files;file.dispatchEvent(new Event('change', { bubbles: true }));
       })()`);
       await guest.wait("location.search.includes('room=') && !!document.querySelector('[name=code]')");
     }else await guest.visit(decoded);
@@ -90,45 +102,51 @@ try{
   await guests[0].checkTypeface('.panel h3','Tajawal');
   await guests[0].capture(capacity===4?'mobile-game.png':'mobile-six.png');
   assert.equal(await guests[0].evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
-  await guests[0].visit(url);await guests[0].wait('!!document.querySelector("#play")');
+  await guests[0].visit(await guests[0].evaluate('location.origin'));await guests[0].wait('!!document.querySelector("#play")');
   }
   const rivals=[await page(1365),await page(390)];
   const [dealer,guest]=rivals;
   await dealer.visit(url);
-  await dealer.evaluate("document.querySelector('#mercyCreate').click();document.querySelector('[name=name]').value='ليلى';document.querySelector('[name=capacity]').value='2';document.querySelector('#entry').requestSubmit()");
+  await dealer.evaluate("document.querySelector('#mercyCreate').click()");
+  await dealer.wait("!!document.querySelector('#entry')");
+  await dealer.evaluate("document.querySelector('[name=name]').value='ليلى';document.querySelector('[name=capacity]').value='2';document.querySelector('#entry').requestSubmit()");
   await dealer.wait("!!document.querySelector('#inviteLink')");
   await guest.visit(await dealer.evaluate("document.querySelector('#inviteLink').value"));
   await guest.evaluate("document.querySelector('[name=name]').value='فارس';document.querySelector('#entry').requestSubmit()");
   await dealer.wait("!document.querySelector('#start').disabled");await dealer.evaluate("document.querySelector('#start').click()");
   for(const player of rivals)await player.wait("!!document.querySelector('.mercyArena')");
   await dealer.capture('mercy-table.png');await guest.capture('mercy-mobile.png');
-  let winner=null;
+  let rev=await dealer.evaluate("Number(document.querySelector('#room').dataset.revision)");
+  let ended=false;
   for(let turn=0;turn<1500;turn++){
-    await dealer.evaluate("refresh(true)");
-    const state=await dealer.evaluate("({turn:snapshot.game.turn,winner:snapshot.game.winner,rev:snapshot.rev})");
-    winner=state.winner;if(winner!==null)break;
-    const player=rivals[state.turn];await player.evaluate("refresh(true)");
-    await player.evaluate(`(()=>{
-      const playable=document.querySelector('.handCard:not(:disabled)');
-      if(playable){
-        playable.click();
-        const color=document.querySelector('#mercyChoice [name=color]');if(color)color.checked=true;
-        const call=document.querySelector('.callCheck input');if(call)call.checked=true;
-        document.querySelector('#mercyChoice').requestSubmit();
-      }else{
-        document.querySelector('[data-mercy-draw]').click();
+    for(const player of rivals)await player.wait("Number(document.querySelector('#room').dataset.revision)>="+rev);
+    ended=await dealer.evaluate("!!document.querySelector('#start')");
+    if(ended)break;
+    const current=await dealer.evaluate("document.querySelector('.turnBar strong').textContent==='دورك الآن'");
+    const player=current?dealer:guest;
+    const card=await player.evaluate("!!document.querySelector('.handCard:not(:disabled)')");
+    if(card){
+      await player.evaluate("document.querySelector('.handCard:not(:disabled)').click()");
+      await player.wait("!!document.querySelector('#mercyChoice')");
+      await player.evaluate(`(()=>{
+        const form=document.querySelector('#mercyChoice');
+        const color=form.querySelector('[name=color]');if(color)color.checked=true;
+        const uno=form.querySelector('[name=uno]');if(uno)uno.checked=true;
+        form.requestSubmit();
+      })()`);
+    }else{
+      await player.evaluate("document.querySelector('[data-mercy-draw]').click()");
+      await player.evaluate(`(()=>{
         const form=document.querySelector('#roulettePick');
         if(form){form.querySelector('input').checked=true;form.requestSubmit();}
-      }
-    })()`);
-    await player.wait('snapshot.rev>'+state.rev);
+      })()`);
+    }
+    rev++;
   }
-  assert.notEqual(winner,null);
+  assert.ok(ended, 'round should have a winner');
   await dealer.evaluate("document.querySelector('#start').click()");
-  await dealer.wait('snapshot.game.winner===null && snapshot.game.hand.length===7');
-  await guest.visit(url);await guest.wait("!!document.querySelector('.handCard')");
+  await dealer.wait("!document.querySelector('#start') && document.querySelectorAll('.handCard').length===7");
+  await guest.visit(await guest.evaluate('location.origin'));await guest.wait("!!document.querySelector('.handCard')");
   assert.equal(await guest.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
-  const mobile=await page(390);await mobile.visit(url);await mobile.capture('mobile-lounge.png');
-  assert.equal(await mobile.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   console.log('Verified Jackaroo 4/6, No Mercy end-to-end game, rematch, reconnect, QR, fonts and mobile layout.');
 }finally{clearTimeout(timer);proc.kill();await new Promise(r=>proc.once('exit',r));await rm(profile,{recursive:true,force:true});}

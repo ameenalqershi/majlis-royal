@@ -1,6 +1,7 @@
+import { makeBoardGeometry } from './geometry.js';
 const marbleSurface=new Image();
 marbleSurface.src='/marble.png';
-function drawBoard(canvas, positions, selected=[], targets=[], last=null) {
+export function drawBoard(canvas, positions, selected=[], targets=[], last=null) {
   const lettering='700 43px Alexandria';
   if(!document.fonts.check(lettering,'مجلس')){
     document.fonts.load(lettering,'مجلس').then(()=>{

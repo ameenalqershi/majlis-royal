@@ -9,7 +9,12 @@ mkdir -p "$out"/{assets,classes,dex}
 # Assemble assets afresh so retired fonts are excluded on incremental builds.
 assets=$(mktemp -d "$out/assets.XXXXXXXX")
 trap 'rm -rf "$assets"' EXIT
-cp -r public core licenses android/host.html "$assets/"
+npm run build
+cp -r dist "$assets/public"
+cp -r core licenses android/host.html "$assets/"
+cp node_modules/react/LICENSE "$assets/licenses/react-MIT.txt"
+cp node_modules/react-dom/LICENSE "$assets/licenses/react-dom-MIT.txt"
+cp node_modules/scheduler/LICENSE "$assets/licenses/scheduler-MIT.txt"
 "$bt/aapt" package -f -M android/AndroidManifest.xml -S android/res -A "$assets" -I "$platform" -F "$out/resources.apk"
 javac --release 8 -classpath "$platform" -d "$out/classes" android/src/games/majlis/*.java
 jar cf "$out/classes.jar" -C "$out/classes" .

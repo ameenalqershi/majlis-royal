@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import '../public/table-rules.js';
+import '../core/table-rules.js';
 import '../core/game.js';
 import '../core/rooms.js';
 const empty=()=>Array(16).fill(-1);

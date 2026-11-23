@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import '../public/mercy-cards.js';
+import '../core/mercy-cards.js';
 import '../core/mercy.js';
 import '../core/rooms.js';
 const play=(g,i,data={})=>Mercy.act(g,g.turn,{move:'card',card:i,...data});

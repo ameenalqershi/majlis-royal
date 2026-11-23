@@ -1,6 +1,6 @@
 // All sector coordinates start at the safety gate. Index zero in the game is
 // the next hole clockwise (base), so a complete lap branches at the gate.
-function makeBoardGeometry(seats) {
+export function makeBoardGeometry(seats) {
   const four=seats===4, sector=TableRules.sector;
   const length=TableRules.trackLength(seats);
   function rotate(s,[x,y]){

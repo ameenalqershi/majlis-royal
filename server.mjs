@@ -2,9 +2,9 @@ import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {networkInterfaces} from 'node:os';
 import {webcrypto} from 'node:crypto';
-import './public/table-rules.js';
+import './core/table-rules.js';
 import './core/game.js';
-import './public/mercy-cards.js';
+import './core/mercy-cards.js';
 import './core/mercy.js';
 import './core/rooms.js';
 if(!globalThis.crypto) globalThis.crypto=webcrypto;
@@ -33,7 +33,7 @@ const server=http.createServer(async(req,res)=>{
     }
     const file=path==='/'?'index.html':path.slice(1);
     if(!/^[\w.-]+$/.test(file) || !types[file.split('.').pop()]) throw Error('ملف غير متاح');
-    const data=await readFile(new URL('./public/'+file,import.meta.url));
+    const data=await readFile(new URL('./dist/'+file,import.meta.url));
     res.setHeader('Content-Type',types[file.split('.').pop()]);
     res.end(data);
   } catch(e) {res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:e.message}));}
