@@ -2,11 +2,7 @@ import * as MercyCards from '../../core/mercy-cards.js';
 import { useState } from 'react';
 import { Dialog } from '../Dialog';
 
-function CardFace({ card }) {
-  const { ink, mark, label, color, sign } = MercyCards.describe(card);
-  return <span className={'face ink-' + ink}><span className="index" dir="ltr">{mark}</span>
-    <b className="pip" dir="ltr">{mark}</b><span className="faceName">{label}</span><small>{sign} {color}</small></span>;
-}
+import { CardBack, CardFace } from './CardFace';
 
 function ColorPicker() {
   return <fieldset className="palette"><legend>اختر اللون</legend>
@@ -18,7 +14,7 @@ function ColorPicker() {
 function CardChoice({ table, index, play, close }) {
   const { game, players, seat } = table;
   const card = game.hand[index];
-  const { ink, rank } = MercyCards.describe(card);
+  const { ink, rank, color, label } = MercyCards.describe(card);
   const last = game.hand.length === 1;
   function submit(event) {
     event.preventDefault();
@@ -28,7 +24,7 @@ function CardChoice({ table, index, play, close }) {
       target: fields.has('target') ? Number(fields.get('target')) : null, uno: fields.has('uno') });
   }
   return <Dialog label="لعب الورقة" onClose={close}><div className="previewCard"><CardFace card={card}/></div>
-    <h2>لعب الورقة</h2><form id="mercyChoice" onSubmit={submit}>
+    <h2>لعب الورقة</h2><p>{color} · {label}</p><form id="mercyChoice" onSubmit={submit}>
       {ink === 'w' && rank !== 'wheel' && !last && <ColorPicker/>}
       {rank === '7' && !last && <label className="field">بدّل يدك مع<select name="target">
         {players.map((name, i) => i !== seat && !game.out[i] && <option key={i} value={i}>{name}</option>)}
@@ -59,7 +55,7 @@ export function Mercy({ table, act, busy }) {
       <ul className="playersRail">{players.map((name, i) => <li key={i} className={game.out[i] ? 'out' : i === game.turn && !over ? 'current' : ''}>
         <span className="avatar">{Array.from(name)[0]}</span><span><strong>{name}{i === seat && ' · أنت'}</strong>
         <small>{game.out[i] ? 'خارج الجولة' : game.counts[i] + ' ورقة'}</small></span></li>)}</ul>
-      <div className="piles"><figure><div className="stock"><i>✥</i><small>مَجلس</small></div><figcaption>رزمة السحب</figcaption></figure>
+      <div className="piles"><figure><CardBack/><figcaption>رزمة السحب</figcaption></figure>
         <figure><CardFace card={game.top}/><figcaption>الورقة العليا</figcaption></figure></div>
       <div className="turnBar" aria-live="polite"><strong>{over ? 'فاز ' + players[game.winner] : game.turn === seat ? 'دورك الآن' : 'دور ' + players[game.turn]}</strong>
         <span>{status(game)}</span></div>
