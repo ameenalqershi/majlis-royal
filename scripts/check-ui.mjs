@@ -35,13 +35,24 @@ async function page(width){
   }
   async function visit(address){await rpc('Page.navigate',{url:address},s);await wait('typeof form==="function" && !!invite');}
   async function capture(file){await writeFile(join(output,file),(await rpc('Page.captureScreenshot',{format:'png'},s)).data,'base64');}
-  return {evaluate,wait,visit,capture};
+  async function checkTypeface(selector,family){
+    await evaluate('document.fonts.ready.then(()=>true)');
+    await rpc('DOM.enable',{},s);await rpc('CSS.enable',{},s);
+    const {root}=await rpc('DOM.getDocument',{},s);
+    const {nodeId}=await rpc('DOM.querySelector',{nodeId:root.nodeId,selector},s);
+    const {fonts}=await rpc('CSS.getPlatformFontsForNode',{nodeId},s);
+    assert.ok(fonts.some(f=>f.isCustomFont && f.familyName.includes(family) && f.glyphCount>0),
+      selector+' should render '+family+'; got '+JSON.stringify(fonts));
+  }
+  return {evaluate,wait,visit,capture,checkTypeface};
 }
 const timer=setTimeout(()=>{proc.kill();process.exit(1);},60000);
 try{
   for(const capacity of [4,6]){
   const host=await page(1365);await host.visit(url);await host.evaluate('document.fonts.ready.then(()=>true)');
-  assert.ok(await host.evaluate("document.fonts.check('700 32px MajlisDisplay') && document.fonts.check('400 16px MajlisText')"));
+  await host.checkTypeface('.hero h1','Alexandria');
+  await host.checkTypeface('.heroCopy p','Tajawal');
+  await host.checkTypeface('#create','Tajawal');
   await host.capture('lounge.png');
   await host.evaluate("document.querySelector('#create').click();document.querySelector('[name=capacity]').value='"+capacity+"';document.querySelector('[name=name]').value='ليلى';document.querySelector('#entry').requestSubmit()");
   await host.wait('!!document.querySelector("#inviteLink")');
@@ -75,6 +86,8 @@ try{
   await host.wait('!!document.querySelector("#play")');await host.capture(capacity===4?'table.png':'table-six.png');
   await host.evaluate('document.querySelector("#play").click()');
   await guests[0].wait('!!document.querySelector("#play")');
+  await guests[0].checkTypeface('.panel h2','Alexandria');
+  await guests[0].checkTypeface('.panel h3','Tajawal');
   await guests[0].capture(capacity===4?'mobile-game.png':'mobile-six.png');
   assert.equal(await guests[0].evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   await guests[0].visit(url);await guests[0].wait('!!document.querySelector("#play")');

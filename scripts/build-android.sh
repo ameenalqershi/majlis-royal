@@ -6,8 +6,11 @@ bt="$sdk/build-tools/${BUILD_TOOLS_VERSION:-35.0.0}"
 platform="$sdk/platforms/android-35/android.jar"
 out="$PWD/build/android"
 mkdir -p "$out"/{assets,classes,dex}
-cp -r public core licenses android/host.html "$out/assets/"
-"$bt/aapt" package -f -M android/AndroidManifest.xml -S android/res -A "$out/assets" -I "$platform" -F "$out/resources.apk"
+# Assemble assets afresh so retired fonts are excluded on incremental builds.
+assets=$(mktemp -d "$out/assets.XXXXXXXX")
+trap 'rm -rf "$assets"' EXIT
+cp -r public core licenses android/host.html "$assets/"
+"$bt/aapt" package -f -M android/AndroidManifest.xml -S android/res -A "$assets" -I "$platform" -F "$out/resources.apk"
 javac --release 8 -classpath "$platform" -d "$out/classes" android/src/games/majlis/*.java
 jar cf "$out/classes.jar" -C "$out/classes" .
 "$bt/d8" --min-api 26 --lib "$platform" --output "$out/dex" "$out/classes.jar"

@@ -1,6 +1,12 @@
 const marbleSurface=new Image();
 marbleSurface.src='/marble.png';
 function drawBoard(canvas, positions, selected=[], targets=[], last=null) {
+  const lettering='700 43px Alexandria';
+  if(!document.fonts.check(lettering,'مجلس')){
+    document.fonts.load(lettering,'مجلس').then(()=>{
+      if(canvas.isConnected)drawBoard(canvas,positions,selected,targets,last);
+    }).catch(()=>{});
+  }
   const c=canvas.getContext('2d'), size=800, mid=size/2;
   canvas.width=canvas.height=size;
   const seats=positions.length/4;
@@ -55,14 +61,14 @@ function drawBoard(canvas, positions, selected=[], targets=[], last=null) {
   c.textAlign='center';
   if(!last){
   c.fillStyle='#ccad73';c.font='30px Georgia';c.fillText('✥',mid,mid-29);
-  c.font='bold 43px MajlisDisplay,serif';c.fillStyle='#efe3c5';c.fillText('مَجلس',mid,mid+20);
+  c.font='700 43px Alexandria,sans-serif';c.fillStyle='#efe3c5';c.fillText('مَجلس',mid,mid+20);
   c.font='13px Georgia';c.fillStyle='#d2bb8e';c.fillText('J A C K A R O O',mid,mid+47);
   }else{
     c.save();c.translate(mid,mid);c.rotate(-.09);
     c.fillStyle='#ede3ca';c.fillRect(-31,-44,62,88);c.strokeStyle='#a88a53';c.strokeRect(-27,-40,54,80);
     c.fillStyle=/[♥♦]/.test(last.card)?'#942f43':'#163b32';c.font='bold 29px Georgia';
     c.fillText(last.card.slice(0,-1),0,-4);c.fillText(last.card.slice(-1),0,28);c.restore();
-    c.font='bold 19px MajlisDisplay,serif';c.fillStyle='#dec99e';c.fillText('آخر ورقة',mid,mid+76);
+    c.font='650 22px Alexandria,sans-serif';c.fillStyle='#dec99e';c.fillText('آخر ورقة',mid,mid+76);
   }
   function locate(id,p){
     const s=Math.floor(id/4);
