@@ -2,6 +2,7 @@ import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {networkInterfaces} from 'node:os';
 import {webcrypto} from 'node:crypto';
+import './public/table-rules.js';
 import './core/game.js';
 import './core/rooms.js';
 if(!globalThis.crypto) globalThis.crypto=webcrypto;

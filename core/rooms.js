@@ -10,16 +10,18 @@ globalThis.Majlis = (() => {
     for(const [code,r] of rooms) if(now-r.used>86400000) rooms.delete(code);
     if(action==='create') {
       if(rooms.size>=100) throw Error('اكتمل عدد الطاولات');
+      const capacity=input.capacity??4;
+      if(![4,6].includes(capacity))throw Error('اختر أربعة أو ستة مقاعد');
       let code;
       do { code=random(3).toUpperCase(); } while(rooms.has(code));
       const player={name:nameOf(input.name),token:random(24)};
-      rooms.set(code,{players:[player],used:now,rev:0,game:null});
+      rooms.set(code,{capacity,players:[player],used:now,rev:0,game:null});
       return {code,token:player.token};
     }
     const r=rooms.get(input.code);
     if(!r) throw Error('تعذّر العثور على هذه الطاولة');
     if(action==='join') {
-      if(r.players.length===4 || r.game) throw Error('اكتملت مقاعد الطاولة');
+      if(r.players.length===r.capacity || r.game) throw Error('اكتملت مقاعد الطاولة');
       const player={name:nameOf(input.name),token:random(24)};
       r.players.push(player);
       r.rev++;
@@ -38,8 +40,8 @@ globalThis.Majlis = (() => {
       return {left:true};
     }
     if(action==='start') {
-      if(seat || r.players.length!==4 || (r.game && r.game.winner===null)) throw Error('يبدأ المضيف بعد اكتمال المقاعد');
-      r.game=Jackaroo.start();
+      if(seat || r.players.length!==r.capacity || (r.game && r.game.winner===null)) throw Error('يبدأ المضيف بعد اكتمال المقاعد');
+      r.game=Jackaroo.start(r.capacity);
       r.rev++;
     } else if(action==='play') {
       if(!r.game || input.rev!==r.rev) throw Error('تغيّرت الطاولة، أعد اختيار الحركة');
@@ -47,7 +49,7 @@ globalThis.Majlis = (() => {
       r.rev++;
     } else if(action!=='state') throw Error('طلب غير معروف');
     const g=r.game;
-    return {code:input.code,rev:r.rev,seat,players:r.players.map(p=>p.name),
+    return {code:input.code,capacity:r.capacity,rev:r.rev,seat,players:r.players.map(p=>p.name),
       game:g && {board:g.board,turn:g.turn,round:g.round,last:g.last,winner:g.winner,
         hand:g.hands[seat],counts:g.hands.map(h=>h.length),
         moves:g.turn===seat && g.winner===null ? Jackaroo.choices(g).map(m=>m.map(({label,pieces,board})=>({label,pieces,targets:pieces.map(i=>board[i])}))) : []}};
