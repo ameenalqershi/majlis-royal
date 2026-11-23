@@ -156,7 +156,7 @@ try{
     const exited = once(proc, 'exit');
     const forceStop = setTimeout(() => proc.kill('SIGKILL'), 5000);
     try {
-      proc.stdio[3].end(JSON.stringify({ id: ++seq, method: 'Browser.close' }) + '\0');
+      await Promise.race([rpc('Browser.close'), exited]);
       await exited;
     } finally {
       clearTimeout(forceStop);
