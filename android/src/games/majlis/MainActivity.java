@@ -44,11 +44,13 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView w, WebResourceRequest r){
                 android.net.Uri u=r.getUrl();
                 if("http".equals(u.getScheme()) && "127.0.0.1".equals(u.getHost()) && u.getPort()==PORT)return false;
+                if(!"http".equals(u.getScheme()) || !u.isHierarchical())return true;
                 String code=u.getQueryParameter("room");
                 if(r.isForMainFrame() && "http".equals(u.getScheme()) && "/".equals(u.getPath()) &&
                     code!=null && code.matches("[0-9A-Fa-f]{6}") && u.getHost()!=null &&
                     u.getHost().matches("(10\\..*|192\\.168\\..*|172\\.(1[6-9]|2[0-9]|3[01])\\..*|[a-zA-Z0-9.-]+\\.local)")){
-                    startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,u));
+                    try{startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,u));}
+                    catch(android.content.ActivityNotFoundException e){Toast.makeText(MainActivity.this,"افتح رابط الدعوة في متصفح الهاتف",Toast.LENGTH_LONG).show();}
                 }
                 return true;
             }

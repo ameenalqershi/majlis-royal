@@ -52,14 +52,17 @@ function drawBoard(canvas, positions, selected=[], targets=[], last=null) {
   for(let i=0;i<length;i++)hole(track(i),i%TableRules.sector===0?metals[i/TableRules.sector]:'#9b927366');
   for(let s=0;s<seats;s++)for(let i=0;i<4;i++){hole(home(s,i),metals[s]);hole(safe(s,i),metals[s]);}
   [109,101,94].forEach((r,i)=>{c.lineWidth=i===1?2:1;circle(mid,mid,r,i===0?'#182e26':null,'#b59d6e');});
-  c.textAlign='center';c.fillStyle='#ccad73';c.font='30px Georgia';c.fillText('✥',mid,mid-29);
+  c.textAlign='center';
+  if(!last){
+  c.fillStyle='#ccad73';c.font='30px Georgia';c.fillText('✥',mid,mid-29);
   c.font='bold 43px MajlisDisplay,serif';c.fillStyle='#efe3c5';c.fillText('مَجلس',mid,mid+20);
   c.font='13px Georgia';c.fillStyle='#d2bb8e';c.fillText('J A C K A R O O',mid,mid+47);
-  if(last){
+  }else{
     c.save();c.translate(mid,mid);c.rotate(-.09);
     c.fillStyle='#ede3ca';c.fillRect(-31,-44,62,88);c.strokeStyle='#a88a53';c.strokeRect(-27,-40,54,80);
     c.fillStyle=/[♥♦]/.test(last.card)?'#942f43':'#163b32';c.font='bold 29px Georgia';
     c.fillText(last.card.slice(0,-1),0,-4);c.fillText(last.card.slice(-1),0,28);c.restore();
+    c.font='bold 19px MajlisDisplay,serif';c.fillStyle='#dec99e';c.fillText('آخر ورقة',mid,mid+76);
   }
   function locate(id,p){
     const s=Math.floor(id/4);

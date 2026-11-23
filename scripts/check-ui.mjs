@@ -39,25 +39,47 @@ async function page(width){
 }
 const timer=setTimeout(()=>{proc.kill();process.exit(1);},60000);
 try{
-  const host=await page(1365);await host.visit(url);await host.capture('lounge.png');
-  await host.evaluate("document.querySelector('#create').click();document.querySelector('[name=name]').value='ليلى';document.querySelector('#entry').requestSubmit()");
+  for(const capacity of [4,6]){
+  const host=await page(1365);await host.visit(url);await host.evaluate('document.fonts.ready.then(()=>true)');
+  assert.ok(await host.evaluate("document.fonts.check('700 32px MajlisDisplay') && document.fonts.check('400 16px MajlisText')"));
+  await host.capture('lounge.png');
+  await host.evaluate("document.querySelector('#create').click();document.querySelector('[name=capacity]').value='"+capacity+"';document.querySelector('[name=name]').value='ليلى';document.querySelector('#entry').requestSubmit()");
   await host.wait('!!document.querySelector("#inviteLink")');
   const code=await host.evaluate('session.code');
+  await host.wait('document.querySelector("#inviteQR").naturalWidth>0');
+  const decoded=await host.evaluate(`(()=>{
+    const img=document.querySelector('#inviteQR'),canvas=document.createElement('canvas');
+    canvas.width=canvas.height=img.naturalWidth;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
+    const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);
+    return jsQR(pixels.data,pixels.width,pixels.height).data;})()`);
+  assert.equal(decoded,await host.evaluate("document.querySelector('#inviteLink').value"));
+  if(capacity===6)await host.capture('invite.png');
   const guests=[];
-  for(const name of ['فارس','نور','سلمى']){
+  for(const name of ['فارس','نور','سلمى','سامي','ريم'].slice(0,capacity-1)){
     const guest=await page(390);guests.push(guest);
-    await guest.visit(url+'/?room='+code);
+    if(guests.length===1){
+      await guest.visit(url);
+      const png=await host.evaluate("document.querySelector('#inviteQR').src");
+      await guest.evaluate(`(async()=>{
+        document.querySelector('#join').click();document.querySelector('#scanInvite').click();
+        const blob=await (await fetch(${JSON.stringify(png)})).blob(),dt=new DataTransfer();
+        dt.items.add(new File([blob],'invitation.png',{type:'image/png'}));
+        const file=document.querySelector('#qrFile');file.files=dt.files;file.dispatchEvent(new Event('change'));
+      })()`);
+      await guest.wait("location.search.includes('room=') && !!document.querySelector('[name=code]')");
+    }else await guest.visit(decoded);
     await guest.evaluate("document.querySelector('[name=name]').value="+JSON.stringify(name)+";document.querySelector('#entry').requestSubmit()");
     await guest.wait('!!document.querySelector("#inviteLink")');
   }
   await host.wait('!document.querySelector("#start").disabled');await host.evaluate('document.querySelector("#start").click()');
-  await host.wait('!!document.querySelector("#play")');await host.capture('table.png');
+  await host.wait('!!document.querySelector("#play")');await host.capture(capacity===4?'table.png':'table-six.png');
   await host.evaluate('document.querySelector("#play").click()');
   await guests[0].wait('!!document.querySelector("#play")');
-  await guests[0].capture('mobile-game.png');
+  await guests[0].capture(capacity===4?'mobile-game.png':'mobile-six.png');
   assert.equal(await guests[0].evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   await guests[0].visit(url);await guests[0].wait('!!document.querySelector("#play")');
+  }
   const mobile=await page(390);await mobile.visit(url);await mobile.capture('mobile-lounge.png');
   assert.equal(await mobile.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
-  console.log('Verified four browser seats, move synchronization, reconnect, mobile layout and four screenshots.');
+  console.log('Verified both table sizes, fonts, QR decoding, guest turns, reconnect and mobile layout.');
 }finally{clearTimeout(timer);proc.kill();await new Promise(r=>proc.once('exit',r));await rm(profile,{recursive:true,force:true});}

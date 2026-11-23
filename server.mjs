@@ -7,7 +7,8 @@ import './core/game.js';
 import './core/rooms.js';
 if(!globalThis.crypto) globalThis.crypto=webcrypto;
 const port=Number(process.env.PORT || 8787);
-const urls=()=>Object.values(networkInterfaces()).flat().filter(a=>a.family==='IPv4'&&!a.internal).map(a=>'http://'+a.address+':'+port);
+const isPrivate=ip=>/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
+const urls=()=>Object.values(networkInterfaces()).flat().filter(a=>a.family==='IPv4'&&!a.internal).sort((a,b)=>Number(isPrivate(b.address))-Number(isPrivate(a.address))).map(a=>'http://'+a.address+':'+port);
 const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css',png:'image/png',webp:'image/webp',ttf:'font/ttf',svg:'image/svg+xml'};
 const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');

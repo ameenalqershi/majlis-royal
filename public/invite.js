@@ -12,7 +12,8 @@ function inviteImage(link) {
 function parseInvite(raw) {
   try{
     const u=new URL(raw);
-    const local=/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname)||u.hostname.endsWith('.local');
+    const ipv4=/^(?:\d{1,3}\.){3}\d{1,3}$/.test(u.hostname);
+    const local=(ipv4 && /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname))||u.hostname.endsWith('.local');
     if(!['http:','https:'].includes(u.protocol)||u.username||u.password||u.pathname!=='/'||(!local&&u.origin!==location.origin))return;
     const code=u.searchParams.get('room');
     if(!/^[A-F\d]{6}$/i.test(code||''))return;
