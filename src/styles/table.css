@@ -1,0 +1,136 @@
+/* The active table shares one toolbar, turn summary and hand across both games. */
+body:has(.playingRoom) {
+  background: #eeeae1;
+  background-image: radial-gradient(ellipse at 50% 0, #fbfaf5, transparent 70%);
+}
+#root > .gameNav { position: static; background: #15182a; }
+.gameNavInner {
+  max-width: 1100px;
+  margin: auto;
+  min-height: 66px;
+  padding: 8px clamp(12px, 3vw, 32px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.gameNavInner button { justify-self: start; }
+.gameNavInner button:last-child { justify-self: end; }
+#root .gameNavInner button {
+  min-height: 42px; padding: 6px 12px; border-radius: 9px; box-shadow: none;
+  background: #ffffff08; color: #f6efdf; border: 1px solid #ffffff26;
+}
+.gameIdentity { text-align: center; }
+.gameIdentity h1 { font: 650 clamp(16px, 2vw, 23px)/1.5 Alexandria, sans-serif; color: #fff9eb; margin: 0; }
+.gameIdentity small { color: #d9c6a4; font-size: 13px; }
+.gameIdentity bdi { font: 600 12px monospace; letter-spacing: .08em; }
+.helpSign { display: inline-grid; place-items: center; border: 1px solid currentColor; width: 1.2em; height: 1.2em; border-radius: 50%; line-height: 1; }
+#room.playingRoom { max-width: 1100px; padding: clamp(10px, 2.5vw, 28px) clamp(10px, 3vw, 32px); }
+.playingRoom :is(.arena, .mercyArena) {
+  display: grid; grid-template-columns: minmax(0, 1.42fr) minmax(300px, 1fr);
+  align-items: start; gap: 16px;
+}
+.playingRoom .tableStatus {
+  grid-column: 1 / -1; display: flex; flex-direction: row; align-items: center;
+  justify-content: space-between; gap: 12px; padding: 15px 20px;
+  background: #fffcf6; color: #242a30; border: 1px solid #d8d2c6;
+  border-inline-start: 4px solid #ad9b7c; border-radius: 12px;
+}
+.playingRoom .tableStatus.myTurn { border-inline-start-color: #2c735d; background: #f5faf5; }
+.turnMessage { min-width: 0; }
+.turnMessage h2 {
+  display: flex; align-items: center; gap: 9px; margin: 0;
+  font: 650 clamp(19px, 2vw, 26px)/1.45 Alexandria, sans-serif; overflow-wrap: anywhere;
+}
+.tableStatus .turnMessage strong { font: inherit; }
+.turnMessage h2 i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #a58960; }
+.myTurn .turnMessage h2 i { background: #297455; box-shadow: 0 0 0 4px #29745518; }
+.turnMessage p { color: #454d4b; font-size: 16px; line-height: 1.45; margin: 3px 0 0; }
+.turnMeta { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.turnMeta span { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.turnMeta i { flex: none; width: 12px; height: 12px; border-radius: 50%; }
+.currentInk { background: var(--inkcard); }
+.boardFrame, .playingRoom .felt {
+  margin: 0; padding: 14px; border-radius: 15px; background-color: #152e28; color: #fff6df;
+  border: 1px solid #354c40; box-shadow: 0 6px 16px #30261912;
+}
+.boardFrame figcaption, .playingRoom .feltTop {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  color: #e3d4b7; font: 500 14px/1.5 Tajawal,sans-serif;
+}
+.boardFrame figcaption { padding: 0 2px 10px; }
+.boardFrame strong, .playingRoom .feltTop span:first-child { font: 600 16px/1.5 Alexandria,sans-serif; color: #fff7e4; }
+.boardFrame .board { aspect-ratio: 1; border: 1px solid #a58c60; border-radius: 8px; box-shadow: none; }
+.boardLegend { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 8px; font-size: 13px; color: #e1dac9; }
+.boardLegend span { display: inline-flex; gap: 6px; align-items: center; }
+.boardLegend i { border: 2px solid #fff3bc; width: 12px; height: 12px; border-radius: 50%; }
+.boardLegend span:last-child i { border-style: dashed; }
+.playingRoom .felt {
+  background: radial-gradient(ellipse at 50% 48%, #32614e, #173c30 70%, #142d26);
+  padding: 18px; box-shadow: inset 0 0 0 5px #152e27, inset 0 0 0 6px #c5ac7152, 0 6px 16px #30261912;
+}
+.playingRoom .piles {
+  min-height: 218px; margin: 12px 0 2px; padding: 16px 10px;
+  border: 1px solid #e6d7b23b; border-radius: 50%;
+  background: radial-gradient(ellipse, #b1c49d14, transparent 75%);
+}
+.playingRoom .piles figcaption { color: #f1e8cf; font-size: 14px; }
+.playingRoom .playersRail { justify-content: start; gap: 5px; margin: 12px 0; }
+.playingRoom .playersRail li { background: #102e24b3; border-color: #ffffff26; min-width: 0; max-width: 100%; }
+.playingRoom .playersRail li.current { background: #f1dfae; border-color: #edcf88; color: #302e24; }
+.playingRoom .playersRail li.current small { color: #544c39; }
+.playingRoom .playersRail strong { overflow-wrap: anywhere; }
+.playingRoom .playersRail .avatar { background: #ffffff1a; color: #f5edd6; }
+.playingRoom .playersRail .current .avatar { background: #635333; color: #fff8e7; }
+.lastEvent { text-align: center; color: #eadfc6; margin: 8px 0 0; font-size: 14px; }
+.playingRoom .gameDock { min-width: 0; background: #fffdf8; padding: 19px; border: 1px solid #d5cfc1; margin: 0; border-radius: 15px; box-shadow: 0 4px 16px #38281b0c; }
+.playingRoom .handTitle { padding-bottom: 9px; border-bottom: 1px solid #e7e1d5; }
+.playingRoom .handTitle h3 { margin: 0; font: 700 23px/1.4 Tajawal,sans-serif; color: #1d302c; }
+.handTitle > span { font-size: 14px; color: #5c6259; }
+.playingRoom .hand, .playingRoom .mercyHand { gap: 7px; margin: 14px 0; justify-content: flex-start; }
+.playingRoom .hand { direction: rtl; }
+.playingRoom .card { direction: ltr; min-width: 42px; min-height: 57px; }
+.playingRoom .card.chosen { outline-color: #22775a; box-shadow: 0 3px 8px #13614226; }
+.playingRoom .mercyHand .handCard:enabled { outline: 2px solid #387a5c; outline-offset: 1px; }
+.playingRoom .mercyHand .handCard:disabled { opacity: .7; }
+.playingRoom .gameDock .solid, .playingRoom .gameDock .gold {
+  min-height: 44px; border-radius: 8px; background: #255c49; color: white; font-weight: 700;
+}
+.gameDock #play { width: 100%; margin-top: 0; }
+.gameDock .field { margin: 12px 0 8px; }
+.gameDock select { min-height: 44px; border: 1px solid #c5c9bc; border-radius: 8px; background: #fff; }
+.gameDock .actions:not(:empty) { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+.tableDetails { border-top: 1px solid #e7e1d5; margin-top: 16px; padding-top: 8px; }
+.tableDetails summary { min-height: 40px; align-content: center; color: #44534c; font-weight: 700; cursor: pointer; }
+.tableDetails summary span { margin-inline-start: 4px; color: #726d60; }
+.gameDock .hint { margin: 6px 0 0; color: #535951; }
+.playingRoom .roomExit { margin-top: 16px; }
+@media (max-width: 760px) {
+  .playingRoom :is(.arena,.mercyArena) { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  .gameNavInner { min-height: 54px; gap: 5px; }
+  #root .gameNavInner button { font-size: 14px; padding-inline: 8px; }
+  .gameIdentity small { display: none; }
+  .playingRoom .tableStatus { padding: 9px 12px; flex-wrap: wrap; gap: 3px 12px; }
+  .turnMessage p { font-size: 15px; }
+  .turnMeta { gap: 10px; }
+  .turnMeta span { font-size: 13px; }
+  .boardFrame, .playingRoom .felt { padding: 10px; }
+  .boardFrame figcaption { padding-bottom: 6px; }
+  .boardFrame .board { max-width: min(100%, 47svh); }
+  .boardLegend { margin-top: 4px; }
+  .playingRoom .piles { min-height: 142px; padding: 7px; margin: 6px 0 0; }
+  .playingRoom .playersRail { margin: 7px 0; }
+  .playingRoom .gameDock { padding: 12px; }
+  .playingRoom .hand, .playingRoom .mercyHand { margin-block: 10px; }
+  .playingRoom .handCard .face { width: 59px; height: 86px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playingRoom .handCard { transition: none; }
+}
+.moveHint { margin: 4px 0 8px; border-inline-start: 2px solid #b89e64; padding-inline-start: 8px; color: #536057; font-size: 14px; }
+
+.handLink { display: none; }
+@media (max-width: 760px) {
+  .playingRoom .handLink { display: inline-flex; align-items: center; min-height: 32px; color: #205641; text-underline-offset: 3px; font-weight: 700; }
+  .playingRoom #playerHand { scroll-margin-block-start: 10px; }
+}

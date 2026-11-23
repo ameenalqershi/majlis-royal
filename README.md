@@ -40,7 +40,7 @@ npm start
 - لبناء APK تجريبي موقّع محليًا، شغّل `npm ci` ثم `npm run android` مع JDK وAndroid SDK Platform 35 وBuild Tools 35.0.0. يمكن تحديد مجلد SDK عبر `ANDROID_HOME`. الناتج `build/android/majlis.apk`. لا تُرفع مفاتيح التوقيع إلى المستودع.
 - قبل نشر إصدار مستقر، أضف الحزمة الموقّعة إلى [مجلد التنزيلات](downloads/) باسم `majlis-<version>.apk`، وانسخ الملف نفسه إلى `majlis-latest.apk`. ارفع الملفين إلى `main` قبل إنشاء وسم الإصدار، وأرفق الحزمة المرقّمة بالإصدار. يتحقق GitHub Actions من تطابقها مع ملفَي التنزيل.
 - اختبارات المحرك والغرف: `node --test test/*.test.mjs`.
-- اختبار الواجهة: شغّل المضيف، ثم نفّذ `CHROME=/path/to/chromium node scripts/check-ui.mjs`. تكتب الأداة لقطات العرض في `build/previews`.
+- اختبار الواجهة: شغّل المضيف، ثم نفّذ `CHROME=/path/to/chromium node scripts/check-ui.mjs`. اضبط `MERCY_SEATS` بين 2 و6 لتحديد مقاعد أونو. يقود الاختبار متصفحًا مستقلًا لكل لاعب من الدعوة حتى الفوز وإعادة اللعب. يشمل التشغيل بمقعدين أيضًا دعوات QR وبدء جاكارو بأربعة وستة مقاعد. تكتب الأداة لقطات العرض في `build/previews`.
 - يشغّل GitHub Actions اختبارات المحرك والواجهة، ويبني APK ويختبر تثبيته وفتح الصالة واستضافة اللعبتين على محاكي Android 15. يمكن تشغيل فحص Android محليًا بعد البناء بالأمر `node scripts/check-android.mjs` مع جهاز اختبار أو محاكي متصل عبر `adb`.
 - [لقطة الصالة](docs/previews/lounge.png) · [اللوح الرباعي](docs/previews/table.png) · [اللوح السداسي](docs/previews/table-six.png) · [دعوة QR](docs/previews/invite.png)
 

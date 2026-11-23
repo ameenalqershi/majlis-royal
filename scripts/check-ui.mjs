@@ -6,10 +6,12 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import assert from 'node:assert/strict';
 const url=process.env.MAJLIS_URL || 'http://127.0.0.1:8787';
+const capacity = Number(process.env.MERCY_SEATS || 2);
+assert.ok([2, 3, 4, 5, 6].includes(capacity), 'supported No Mercy capacity');
 const output=process.env.PREVIEW_DIR || 'build/previews';
 await mkdir(output,{recursive:true});
 const profile=await mkdtemp(join(tmpdir(),'majlis-browser-'));
-const proc=spawn(process.env.CHROME || 'chromium',['--headless','--disable-gpu','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-pipe','--user-data-dir='+profile],{stdio:['ignore','ignore','inherit','pipe','pipe']});
+const proc=spawn(process.env.CHROME || 'chromium',['--headless','--disable-gpu','--disable-background-timer-throttling','--disable-renderer-backgrounding','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-pipe','--user-data-dir='+profile],{stdio:['ignore','ignore','inherit','pipe','pipe']});
 const pending=new Map();let seq=0,incoming='';
 proc.stdio[4].on('data',buf=>{
   incoming+=buf.toString();let end;
@@ -45,7 +47,8 @@ async function page(width){
     assert.ok(fonts.some(f=>f.isCustomFont && f.familyName.includes(family) && f.glyphCount>0),
       selector+' should render '+family+'; got '+JSON.stringify(fonts));
   }
-  return {evaluate,wait,visit,capture,checkTypeface};
+  const close = () => rpc('Target.disposeBrowserContext', { browserContextId });
+  return {evaluate,wait,visit,capture,checkTypeface,close};
 }
 const timer=setTimeout(()=>{proc.kill();process.exit(1);},900000);
 try{
@@ -57,7 +60,9 @@ try{
   assert.equal(await mobile.evaluate("getComputedStyle(document.querySelector('#modal .close')).position"), 'absolute');
   await mobile.evaluate("document.querySelector('#modal .close').click()");
   await mobile.wait("!document.querySelector('#modal')");
-  for(const capacity of [4,6]){
+  await mobile.close();
+  const jackarooSizes = capacity === 2 ? [4, 6] : [];
+  for(const capacity of jackarooSizes){
   const host=await page(1365);await host.visit(url);await host.evaluate('document.fonts.ready.then(()=>true)');
   await host.checkTypeface('.collection h2','Alexandria');
   await host.checkTypeface('.heroCopy p','Tajawal');
@@ -99,32 +104,48 @@ try{
   await host.wait('!!document.querySelector("#play")');await host.capture(capacity===4?'table.png':'table-six.png');
   await host.evaluate('document.querySelector("#play").click()');
   await guests[0].wait('!!document.querySelector("#play")');
-  await guests[0].checkTypeface('.panel h2','Alexandria');
+  await guests[0].checkTypeface('.turnMessage strong','Alexandria');
   await guests[0].checkTypeface('.panel h3','Tajawal');
   await guests[0].capture(capacity===4?'mobile-game.png':'mobile-six.png');
   assert.equal(await guests[0].evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   await guests[0].visit(await guests[0].evaluate('location.origin'));await guests[0].wait('!!document.querySelector("#play")');
+  await Promise.all([host,...guests].map(p => p.close()));
   }
-  const rivals=[await page(1365),await page(390)];
-  const [dealer,guest]=rivals;
+  const dealer = await page(1365);
+  const rivals = [dealer];
   await dealer.visit(url);
   await dealer.evaluate("document.querySelector('#mercyCreate').click()");
   await dealer.wait("!!document.querySelector('#entry')");
-  await dealer.evaluate("document.querySelector('[name=name]').value='ليلى';document.querySelector('[name=capacity]').value='2';document.querySelector('#entry').requestSubmit()");
+  await dealer.evaluate(`document.querySelector('[name=name]').value='ليلى';document.querySelector('[name=capacity]').value='${capacity}';document.querySelector('#entry').requestSubmit()`);
   await dealer.wait("!!document.querySelector('#inviteLink')");
-  await guest.visit(await dealer.evaluate("document.querySelector('#inviteLink').value"));
-  await guest.evaluate("document.querySelector('[name=name]').value='فارس';document.querySelector('#entry').requestSubmit()");
+  const link = await dealer.evaluate("document.querySelector('#inviteLink').value");
+  for (const name of ['فارس','نور','سلمى','سامي','ريم'].slice(0, capacity - 1)) {
+    await dealer.wait("document.querySelector('#start').disabled");
+    const player = await page(390);
+    rivals.push(player);
+    await player.visit(link);
+    await player.evaluate(`document.querySelector('[name=name]').value=${JSON.stringify(name)};document.querySelector('#entry').requestSubmit()`);
+    await player.wait("!!document.querySelector('#inviteLink')");
+  }
+  const guest = rivals[1];
   await dealer.wait("!document.querySelector('#start').disabled");await dealer.evaluate("document.querySelector('#start').click()");
   for(const player of rivals)await player.wait("!!document.querySelector('.mercyArena')");
   await dealer.capture('mercy-table.png');await guest.capture('mercy-mobile.png');
+  await guest.evaluate("document.querySelector('#guideMenu').click()");
+  await guest.wait("!!document.querySelector('#modal .rules')");
+  await guest.evaluate("document.querySelector('#modal .close').click()");
+  assert.equal(await guest.evaluate("document.querySelectorAll('.playersRail li').length"), capacity);
+  assert.equal(await guest.evaluate("document.querySelector('.tableStatus').getBoundingClientRect().bottom <= document.querySelector('.felt').getBoundingClientRect().top"), true);
   let rev=await dealer.evaluate("Number(document.querySelector('#room').dataset.revision)");
   let ended=false;
   for(let turn=0;turn<1500;turn++){
-    for(const player of rivals)await player.wait("Number(document.querySelector('#room').dataset.revision)>="+rev);
+    await Promise.all(rivals.map(p => p.wait("Number(document.querySelector('#room').dataset.revision)>="+rev)));
     ended=await dealer.evaluate("!!document.querySelector('#start')");
     if(ended)break;
-    const current=await dealer.evaluate("document.querySelector('.turnBar strong').textContent==='دورك الآن'");
-    const player=current?dealer:guest;
+    const current = await dealer.evaluate("Array.from(document.querySelectorAll('.playersRail li')).findIndex(el => el.classList.contains('current'))");
+    assert.ok(current >= 0 && current < capacity);
+    const player = rivals[current];
+    assert.equal(await player.evaluate("document.querySelector('.turnBar strong').textContent"), 'دورك الآن');
     const card=await player.evaluate("!!document.querySelector('.handCard:not(:disabled)')");
     if(card){
       await player.evaluate("document.querySelector('.handCard:not(:disabled)').click()");
@@ -149,7 +170,12 @@ try{
   await dealer.wait("!document.querySelector('#start') && document.querySelectorAll('.handCard').length===7");
   await guest.visit(await guest.evaluate('location.origin'));await guest.wait("!!document.querySelector('.handCard')");
   assert.equal(await guest.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
-  console.log('Verified Jackaroo 4/6, No Mercy end-to-end game, rematch, reconnect, QR, fonts and mobile layout.');
+  await dealer.evaluate("document.querySelector('#exitRoom').click()");
+  await dealer.wait("!!document.querySelector('#confirmExit')");
+  await dealer.evaluate("document.querySelector('#confirmExit').click()");
+  await Promise.all(rivals.map(p => p.wait("!!document.querySelector('#landing')")));
+  console.log('Verified No Mercy:', capacity, 'independent players, complete game, rematch, reconnect and table closure.');
+  await Promise.all(rivals.map(p => p.close()));
 } finally {
   clearTimeout(timer);
   if (proc.exitCode === null && proc.signalCode === null) {

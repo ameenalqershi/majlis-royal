@@ -425,3 +425,5 @@
 #room select[dir='ltr'] {
   background-position: right 1rem center;
 }
+#room .lobbyNext { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-block: 1px solid var(--mj-line); padding-block: 10px; }
+#room .lobbyNext strong { color: var(--mj-sand-100); font-size: 16px; }

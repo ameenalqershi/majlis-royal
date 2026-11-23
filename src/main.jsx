@@ -41,23 +41,29 @@ function App() {
     else setDialog({ type, kind });
   }
   const host = state?.seat === 0;
+  const playing = open && !!state?.game;
+  const gameName = state?.kind === 'mercy' ? 'أونو لا ترحم' : 'جاكارو المجلس';
   return <>
-    <header><div className="bar">
+    {playing ? <header className="gameNav"><div className="gameNavInner">
+      <button id="home" onClick={() => setOpen(false)} aria-label="العودة إلى صالة الألعاب"><span aria-hidden="true">→</span> الصالة</button>
+      <div className="gameIdentity"><h1>{gameName}</h1><small>طاولة <bdi>{state.code}</bdi></small></div>
+      <button id="guideMenu" onClick={() => guide(state.kind)}><span className="helpSign" aria-hidden="true">؟</span> دليل اللعب</button>
+    </div></header> : <header><div className="bar">
       <a className="brand" href="/" onClick={e => { e.preventDefault(); setOpen(false); }}><i className="seal">✥</i><span>مَجلس<small>MAJLIS</small></span></a>
       <nav><button id="home" aria-current={open ? undefined : 'page'} onClick={() => setOpen(false)}>صالة الألعاب</button>
         <button id="guideMenu" onClick={() => guide(open && state ? state.kind : null)}>دليل اللعب</button></nav>
       <button className="network" id="network" onClick={() => setDialog({ type: 'network' })}><i/> الشبكة المحلية</button>
-    </div></header>
+    </div></header>}
     {!open ? <Lounge resume={!!seat} onEntry={entry} onGuide={guide}/> : !state ?
       <main id="room"><p role="status">جارٍ الاتصال بالطاولة…</p></main> :
-      <main id="room" data-revision={state.rev}>
-        <div className="roomHead"><h2>{state.kind === 'mercy' ? 'أونو لا ترحم' : 'جاكارو المجلس'}</h2><code className="roomCode">{state.code}</code>
-          <button className="light" onClick={() => guide(state.kind, 1)}>دليل الأوراق</button></div>
+      <main id="room" className={playing ? 'playingRoom' : undefined} data-revision={state.rev}>
+        {!playing && <div className="roomHead"><h2>{gameName}</h2><code className="roomCode">{state.code}</code>
+          <button className="light" onClick={() => guide(state.kind, 1)}>دليل الأوراق</button></div>}
         {!state.game ? <Lobby table={state} addresses={addresses} invite={invite} setInvite={setInvite} hostLocal={hostLocal} busy={busy} start={() => act('start')} notify={notify}/> :
           state.kind === 'mercy' ? <Mercy table={state} act={act} busy={busy}/> : <Jackaroo key={state.rev} table={state} act={act} busy={busy}/>}
         {(host || !state.game || state.game.winner !== null) && <div className="roomExit"><button id="exitRoom" onClick={() => setDialog({ type: 'exit' })}>{host ? 'إنهاء الطاولة' : 'مغادرة المقعد'}</button></div>}
       </main>}
-    <footer><span>✥ &nbsp; مَجلس</span><small>صالة الألعاب المحلية</small></footer>
+    {!playing && <footer><span>✥ &nbsp; مَجلس</span><small>صالة الألعاب المحلية</small></footer>}
     {dialog && <Dialog onClose={close} label={dialog.type === 'guide' ? 'دليل اللعب' : 'مجلس'}>
       {['create','join'].includes(dialog.type) && <Entry mode={dialog.type} kind={dialog.kind} code={initialInvite} enter={enter} onClose={close} onScan={() => setDialog({ type: 'scan' })}/>}
       {dialog.type === 'scan' && <Scanner/>}

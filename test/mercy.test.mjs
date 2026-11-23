@@ -58,3 +58,106 @@ test('full games at every capacity conserve all 168 cards on every turn',()=>{
     assert.notEqual(g.winner,null);
   }
 });
+
+for (const seats of [2, 3, 4, 5, 6]) {
+  test('No Mercy opening deck and turn effects at ' + seats + ' seats', () => {
+    const g = Mercy.start(seats);
+    assert.deepEqual(g.hands.map(hand => hand.length), Array(seats).fill(7));
+    assert.match(g.discard.at(-1), /^[rbgy][0-9]$/);
+    const inventory = {};
+    for (const card of [...g.hands.flat(), ...g.discard, ...g.pile])
+      inventory[card] = (inventory[card] || 0) + 1;
+    const expected = { wback4: 8, wwheel: 8, wd6: 4, wd10: 4 };
+    for (const ink of 'rbgy') {
+      for (let n = 0; n <= 9; n++) expected[ink + n] = 2;
+      for (const rank of ['skip', 'reverse', 'd2', 'discard']) expected[ink + rank] = 3;
+      for (const rank of ['all', 'd4']) expected[ink + rank] = 2;
+    }
+    assert.deepEqual(inventory, expected);
+    for (const [card, turn, direction] of [
+      ['r2', 1, 1], ['rskip', 2 % seats, 1], ['rall', 0, 1],
+      ['rreverse', seats === 2 ? 0 : seats - 1, -1],
+      ['wback4', seats === 2 ? 0 : seats - 1, -1],
+    ]) {
+      const round = table(Array.from({length: seats}, () => [card, 'b1']));
+      play(round, 0, {color: 'b'});
+      assert.equal(round.turn, turn, card);
+      assert.equal(round.direction, direction, card);
+    }
+  });
+}
+
+test('each draw card accepts equal or higher stacks and permits taking the debt', () => {
+  const cards = ['rd2', 'rd4', 'wback4', 'wd6', 'wd10'];
+  const values = [2, 4, 4, 6, 10];
+  for (let i = 0; i < cards.length; i++) {
+    const opponents = ['gd2', 'gd4', 'wback4', 'wd6', 'wd10'];
+    const g = table([[cards[i], 'r8'], [...opponents], [...opponents]]);
+    play(g, 0, {color:'g'});
+    assert.equal(g.floor, values[i]);
+    assert.equal(g.debt, values[i]);
+    const victim = g.turn;
+    assert.deepEqual(Mercy.view(g, victim).playable, values.flatMap((v, index) => v >= values[i] ? [index] : []));
+    Mercy.act(g, victim, {move: 'draw'});
+    assert.equal(g.hands[victim].length, 5 + values[i]);
+    assert.equal(g.debt, 0);
+    assert.equal(g.floor, 0);
+    assert.notEqual(g.turn, victim);
+  }
+});
+
+test('matching, invalid choices, recycling and forced play preserve the table', () => {
+  const g = table([['g3', 'r8', 'b1', 'wd6', 'r7'], ['b2'], []]);
+  g.out[2] = true;
+  assert.deepEqual(Mercy.view(g, 0).playable, [0, 1, 3, 4]);
+  for (const invalid of [{move:'draw'}, {move:'card',card:2}, {move:'card',card:3,color:'x'},
+    {move:'card',card:4,target:0}, {move:'card',card:4,target:2}]) {
+    const before = structuredClone(g);
+    assert.throws(() => Mercy.act(g, 0, invalid));
+    assert.deepEqual(g, before);
+  }
+  const h = table([['g9'], ['y8']]);
+  h.pile = []; h.reserve = ['r2']; h.discard = ['r1', 'r3'];
+  Mercy.act(h, 0, {move:'draw'});
+  assert.deepEqual(h.discard, ['r3']);
+  assert.deepEqual(h.reserve, []);
+  assert.deepEqual(Mercy.view(h, 0).playable, [1]);
+  assert.equal(h.pile.length, 1);
+  assert.throws(() => Mercy.act(h, 0, {move:'draw'}));
+  play(h, 1);
+  assert.equal(h.forced, null);
+  const action = table([['gskip','g3'], ['r3']]);
+  action.discard = ['rskip'];
+  assert.deepEqual(Mercy.view(action,0).playable,[0]);
+});
+
+test('UNO declaration, missed window and victory take effect at the right move', () => {
+  const g = table([['r1','b2'], ['r2','b3'], ['g4','g3']]);
+  play(g, 0);
+  assert.throws(() => Mercy.act(g, 0, {move:'catch',target:0}));
+  Mercy.act(g, 0, {move:'call'});
+  assert.deepEqual(g.exposed, []);
+  const h = table([['r1','b2'], ['r2','b3'], ['g4','g3']]);
+  play(h, 0);
+  play(h, 0, {uno:true});
+  assert.throws(() => Mercy.act(h, 2, {move:'catch',target:0}));
+  for (const finalCard of ['r7','r0','wd10','wwheel']) {
+    const last = table([[finalCard], ['r8','g1']]);
+    play(last, 0);
+    assert.equal(last.winner, 0);
+    assert.throws(() => Mercy.act(last, 1, {move:'draw'}));
+  }
+});
+
+test('ordinary draws and roulette stop at the 25th card and skip the eliminated seat', () => {
+  for (const roulette of [false, true]) {
+    const g = table([Array(24).fill('b1'), ['r4'], ['g7']]);
+    g.pile = ['b9', 'y4']; g.roulette = roulette;
+    Mercy.act(g, 0, {move:'draw', color:'g'});
+    assert.deepEqual(g.out, [true,false,false]);
+    assert.equal(g.reserve.length, 25);
+    assert.equal(g.turn, 1);
+    assert.equal(g.pile.length, 1);
+    assert.throws(() => Mercy.act(g, 0, {move:'draw'}));
+  }
+});

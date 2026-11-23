@@ -13,7 +13,13 @@ permissions:
 
 jobs:
   web:
-    name: Game rules and browser play
+    name: Browser play (${{ matrix.seats }} seats)
+    strategy:
+      fail-fast: false
+      matrix:
+        seats: [2, 3, 4, 5, 6]
+    env:
+      MERCY_SEATS: ${{ matrix.seats }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -37,7 +43,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-checks
+          name: browser-checks-${{ matrix.seats }}
           path: |
             build/previews/
             build-server.log

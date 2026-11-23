@@ -28,6 +28,12 @@ export function Lobby({ table, addresses, invite, setInvite, hostLocal, start, b
   }
   return <section className="lobby">
     <div><h2>مقاعد الطاولة</h2><p>{table.players.length} من {table.capacity} لاعبين · {table.kind === 'mercy' ? 'لعب فردي' : 'يجلس الشريكان متقابلين'}</p></div>
+    <div className="lobbyNext" role="status">
+      <strong>{table.players.length === table.capacity
+        ? (table.seat === 0 ? 'اكتملت المقاعد. يمكنك بدء المباراة.' : 'اكتملت المقاعد. بانتظار بدء المضيف.')
+        : 'شارك الدعوة لإكمال المقاعد المتبقية · ' + (table.capacity - table.players.length)}</strong>
+      {table.seat === 0 && <button className="gold" id="start" disabled={busy || table.players.length !== table.capacity} onClick={start}>بدء المباراة</button>}
+    </div>
     <Seats table={table}/>
     <div className="inviteBox" id="inviteBox">
       <h3>دعوة اللاعبين</h3>
@@ -40,6 +46,6 @@ export function Lobby({ table, addresses, invite, setInvite, hostLocal, start, b
       <label className="field">رابط الدعوة<input dir="ltr" ref={input} id="inviteLink" readOnly value={link}/></label>
       <button className="light" id="copy" onClick={copy}>نسخ الرابط</button>
     </div>
-    {table.seat === 0 && <button className="gold" id="start" disabled={busy || table.players.length !== table.capacity} onClick={start}>بدء المباراة</button>}
+
   </section>;
 }

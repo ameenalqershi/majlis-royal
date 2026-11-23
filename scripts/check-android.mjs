@@ -59,6 +59,11 @@ async function exerciseTable(kind, capacity) {
     assert.equal(guestState.rev, state.rev);
     if (kind === 'mercy') {
       assert.equal(guestState.game.hand.length, 7);
+      const card = state.game.playable[0];
+      const move = card === undefined ? { move: 'draw' } : { move: 'card', card, target: 1, color: 'b' };
+      const next = await request('play', { ...host, ...move, rev: state.rev });
+      assert.equal(next.rev, state.rev + 1);
+      assert.equal((await request('state', guests.at(-1))).rev, next.rev);
     } else {
       assert.equal(state.game.board.length, capacity * 4);
       const card = state.game.moves.findIndex(moves => moves.length);
@@ -76,8 +81,8 @@ try {
   adb('install', '-r', apk);
   adb('shell', 'am', 'start', '-W', '-n', 'games.majlis.royal/games.majlis.MainActivity');
   await waitForLounge();
-  await exerciseTable('jackaroo', 4);
-  await exerciseTable('mercy', 2);
+  for (const seats of [4, 6]) await exerciseTable('jackaroo', seats);
+  for (const seats of [2, 3, 4, 5, 6]) await exerciseTable('mercy', seats);
   console.log('Verified the installed APK, Arabic lounge, native LAN host and both engines.');
 } catch (error) {
   mkdirSync(diagnostics, { recursive: true });

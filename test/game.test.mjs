@@ -92,3 +92,84 @@ test('six players need six seats, opposite partners, equal deals and 108 track h
   Jackaroo.play(g,2,0,0);
   assert.equal(g.board[20],108);assert.equal(g.winner,2);
 });
+
+for (const seats of [4, 6]) {
+  test('Jackaroo movement, protection, burn and deal rotation at ' + seats + ' seats', () => {
+    const g = Jackaroo.start(seats);
+    const length = TableRules.trackLength(seats);
+    const board = g.board.slice();
+    board[0] = 12;
+    for (const [rank, steps] of Object.entries({
+      A:[1,11], 2:[2], 3:[3], 4:[-4], 5:[5], 6:[6], 7:[7], 8:[8], 9:[9], 10:[10], Q:[12], K:[13],
+    })) {
+      const destinations = opts(board, rank+'♣').filter(m => m.pieces[0] === 0).map(m => m.board[0]);
+      assert.deepEqual(destinations, steps.map(n => 12+n), rank);
+    }
+    board[4] = 0;
+    assert.deepEqual(opts(board,'J♠'), []);
+    board[4] = length;
+    assert.deepEqual(opts(board,'J♠'), []);
+    board[4] = length - 1;
+    assert.ok(opts(board,'5♠').some(m => m.board[4] === 4));
+    board[4] = length - TableRules.sector;
+    for (const rank of ['A','K']) {
+      const launch = opts(board,rank+'♠').find(m => m.board[1] === 0);
+      assert.equal(launch.board[4], -1);
+    }
+    g.hands[0] = ['2♠','3♥'];
+    assert.ok(Jackaroo.choices(g).every(moves => moves.length === 1 && moves[0].pieces.length === 0));
+    g.hands[0].push('K♠');
+    assert.deepEqual(Jackaroo.choices(g).map(moves => moves.length), [0,0,1]);
+    const rounds = Jackaroo.start(seats);
+    const sizes = seats === 4 ? [4,4,5,4] : [4,4,4,5,4];
+    for (const [round, size] of sizes.entries()) {
+      assert.equal(rounds.turn, round % seats);
+      assert.deepEqual(rounds.hands.map(h => h.length), Array(seats).fill(size));
+      rounds.hands = rounds.hands.map(hand => hand.map(() => '2♠'));
+      for (let i = 0; i < size * seats; i++) Jackaroo.play(rounds, rounds.turn, 0, 0);
+      assert.deepEqual(rounds.board, Array(seats * 4).fill(-1));
+    }
+  });
+}
+
+for (const seats of [4, 6]) {
+  test('all Jackaroo seats play, win, restart and close through the room API: ' + seats, () => {
+    const host = request('create', {name:'مضيف', kind:'jackaroo', capacity:seats});
+    const players = [host];
+    try {
+      while (players.length < seats) {
+        assert.throws(() => request('start', host));
+        players.push(request('join', {code:host.code, name:'لاعب '+players.length}));
+      }
+      assert.throws(() => request('start', players[1]));
+      let state = request('start', host);
+      let turnCount = 0;
+      const length = TableRules.trackLength(seats);
+      while (state.game.winner === null && turnCount++ < 6000) {
+        const turn = state.game.turn;
+        const player = players[turn];
+        const {game, rev} = request('state', player);
+        const score = board => board.reduce((sum, pos, id) => {
+          const allied = Math.floor(id / 4) % (seats / 2) === turn % (seats / 2);
+          return sum + (allied ? 1 : -1) * (pos < 0 ? -24 : pos >= length ? 130 + pos : pos);
+        }, 0);
+        const choices = game.hand.flatMap((value, card) =>
+          Jackaroo.options(game.board, turn, value).map((candidate, move) =>
+            ({card, move, score:score(candidate.board)})));
+        const best = choices.sort((a,b) => b.score-a.score)[0] || {card:0, move:0};
+        state = request('play', {...player, card:best.card, move:best.move, rev});
+        assert.equal(state.rev, rev + 1);
+      }
+      assert.notEqual(state.game.winner, null);
+      for (const player of players)
+        assert.equal(request('state', player).game.winner, state.game.winner);
+      const next = request('start', host);
+      assert.equal(next.game.winner, null);
+      assert.equal(next.game.round, 1);
+      assert.deepEqual(next.game.board, Array(seats*4).fill(-1));
+    } finally {
+      request('leave', host);
+    }
+    for (const player of players) assert.throws(() => request('state', player));
+  });
+}
