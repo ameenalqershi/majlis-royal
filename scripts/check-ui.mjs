@@ -1,5 +1,6 @@
 // Run against an already-running local Majlis server with a Chromium executable.
 import {spawn} from 'node:child_process';
+import {once} from 'node:events';
 import {mkdtemp,writeFile,rm,mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -149,4 +150,18 @@ try{
   await guest.visit(await guest.evaluate('location.origin'));await guest.wait("!!document.querySelector('.handCard')");
   assert.equal(await guest.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
   console.log('Verified Jackaroo 4/6, No Mercy end-to-end game, rematch, reconnect, QR, fonts and mobile layout.');
-}finally{clearTimeout(timer);proc.kill();await new Promise(r=>proc.once('exit',r));await rm(profile,{recursive:true,force:true});}
+} finally {
+  clearTimeout(timer);
+  if (proc.exitCode === null && proc.signalCode === null) {
+    const exited = once(proc, 'exit');
+    const forceStop = setTimeout(() => proc.kill('SIGKILL'), 5000);
+    try {
+      proc.stdio[3].end(JSON.stringify({ id: ++seq, method: 'Browser.close' }) + '\0');
+      await exited;
+    } finally {
+      clearTimeout(forceStop);
+    }
+  }
+  // Chromium's child processes can finish writing the profile just after exit.
+  await rm(profile, { recursive: true, force: true, maxRetries: 8, retryDelay: 150 });
+}
