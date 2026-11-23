@@ -34,7 +34,16 @@ async function page(width){
     if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description || 'JavaScript failure');return r.result.value;
   };
   async function wait(expression){
-    for(let i=0;i<100;i++){if(await evaluate(expression))return;await new Promise(r=>setTimeout(r,100));}throw Error('Timeout '+expression+' at '+await evaluate('location.href')+' · '+await evaluate('document.body.innerText.slice(-300)'));
+    for (let i = 0; i < 150; i++) {
+      try {
+        if (await evaluate(expression)) return;
+      } catch (error) {
+        // Following a scanned invite replaces the page while it is being polled.
+        if (!/Inspected target navigated|Execution context was destroyed|Cannot find context/.test(error.message)) throw error;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw Error('Timeout '+expression+' at '+await evaluate('location.href')+' · '+await evaluate('document.body.innerText.slice(-300)'));
   }
   async function visit(address){await rpc('Page.navigate',{url:address},s);await wait('!!document.querySelector("#home")');}
   async function capture(file){await evaluate('Promise.allSettled(document.getAnimations().filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)).then(() => true)');await writeFile(join(output,file),(await rpc('Page.captureScreenshot',{format:'png'},s)).data,'base64');}
