@@ -11,11 +11,14 @@ globalThis.Majlis = (() => {
     if(action==='create') {
       if(rooms.size>=100) throw Error('اكتمل عدد الطاولات');
       const capacity=input.capacity??4;
-      if(![4,6].includes(capacity))throw Error('اختر أربعة أو ستة مقاعد');
+      const kind=input.kind??'jackaroo';
+      if(!['jackaroo','mercy'].includes(kind))throw Error('لعبة غير متاحة');
+      if(kind==='mercy'&&(!Number.isInteger(capacity)||capacity<2||capacity>6))throw Error('اختر بين مقعدين وستة مقاعد');
+      if(kind==='jackaroo'&&![4,6].includes(capacity))throw Error('اختر أربعة أو ستة مقاعد');
       let code;
       do { code=random(3).toUpperCase(); } while(rooms.has(code));
       const player={name:nameOf(input.name),token:random(24)};
-      rooms.set(code,{capacity,players:[player],used:now,rev:0,game:null});
+      rooms.set(code,{capacity,kind,players:[player],used:now,rev:0,game:null});
       return {code,token:player.token};
     }
     const r=rooms.get(input.code);
@@ -41,18 +44,19 @@ globalThis.Majlis = (() => {
     }
     if(action==='start') {
       if(seat || r.players.length!==r.capacity || (r.game && r.game.winner===null)) throw Error('يبدأ المضيف بعد اكتمال المقاعد');
-      r.game=Jackaroo.start(r.capacity);
+      r.game=r.kind==='mercy'?Mercy.start(r.capacity):Jackaroo.start(r.capacity);
       r.rev++;
     } else if(action==='play') {
       if(!r.game || input.rev!==r.rev) throw Error('تغيّرت الطاولة، أعد اختيار الحركة');
-      Jackaroo.play(r.game,seat,input.card,input.move);
+      if(r.kind==='mercy')Mercy.act(r.game,seat,input);
+      else Jackaroo.play(r.game,seat,input.card,input.move);
       r.rev++;
     } else if(action!=='state') throw Error('طلب غير معروف');
     const g=r.game;
-    return {code:input.code,capacity:r.capacity,rev:r.rev,seat,players:r.players.map(p=>p.name),
-      game:g && {board:g.board,turn:g.turn,round:g.round,last:g.last,winner:g.winner,
+    return {code:input.code,capacity:r.capacity,kind:r.kind,rev:r.rev,seat,players:r.players.map(p=>p.name),
+      game:g && (r.kind==='mercy'?Mercy.view(g,seat):{board:g.board,turn:g.turn,round:g.round,last:g.last,winner:g.winner,
         hand:g.hands[seat],counts:g.hands.map(h=>h.length),
-        moves:g.turn===seat && g.winner===null ? Jackaroo.choices(g).map(m=>m.map(({label,pieces,board})=>({label,pieces,targets:pieces.map(i=>board[i])}))) : []}};
+        moves:g.turn===seat && g.winner===null ? Jackaroo.choices(g).map(m=>m.map(({label,pieces,board})=>({label,pieces,targets:pieces.map(i=>board[i])}))) : []})};
   }
   return {request};
 })();

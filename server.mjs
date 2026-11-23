@@ -4,6 +4,8 @@ import {networkInterfaces} from 'node:os';
 import {webcrypto} from 'node:crypto';
 import './public/table-rules.js';
 import './core/game.js';
+import './public/mercy-cards.js';
+import './core/mercy.js';
 import './core/rooms.js';
 if(!globalThis.crypto) globalThis.crypto=webcrypto;
 const port=Number(process.env.PORT || 8787);
