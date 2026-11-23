@@ -1,11 +1,62 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102923"><title>مجلس | صالة الألعاب</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/mercy.css">
-<header><div class="bar"><a class="brand" href="/"><i class="seal">✥</i><span>مَجلس<small>MAJLIS</small></span></a><nav><button id="home">صالة الألعاب</button><button id="guideMenu">دليل اللعب</button></nav><button class="network" id="network"><i></i> الشبكة المحلية</button></div></header>
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102923"><title>مجلس رويال | صالة الألعاب</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/mercy.css"><link rel="stylesheet" href="/premium-ui.css">
+<header class="site-header"><div class="bar"><a class="brand" href="/"><i class="seal">✥</i><span>مَجلس<small>MAJLIS</small></span></a><nav class="site-nav" aria-label="القائمة الرئيسية"><button id="home">صالة الألعاب</button><button id="guideMenu">دليل اللعب</button></nav><button type="button" class="network" id="network"><i></i> الشبكة المحلية</button></div></header>
 <main id="landing">
-<div class="libraryHead"><div><div class="eyebrow dark"><b></b> صالة الألعاب المحلية</div><h1>اختر طاولتك</h1></div><button class="light" id="join">انضم إلى طاولة <span>↙</span></button></div>
-<section class="collection" aria-label="ألعاب المجلس">
-<article class="hero mercyCover"><div class="photo"></div><div class="heroCopy"><div class="eyebrow"><b></b> لعبة أوراق · ٢–٦ لاعبين</div><h2>أونو لا ترحم</h2><div class="latin" lang="en">SHOW ’EM NO MERCY</div><p>كدّس أوراق السحب، وبدّل يدك في اللحظة المناسبة. عند الورقة الخامسة والعشرين تغادر الطاولة.</p><div class="actions"><button class="gold" id="mercyCreate">العب أونو <span>＋</span></button><button class="outline" data-mercy-guide>دليل اللعبة</button></div></div><span class="corner tl"></span></article>
-<article class="hero jackCover"><div class="photo"></div><div class="heroCopy"><div class="eyebrow"><b></b> لعبة شراكة · ٤ أو ٦ لاعبين</div><h2>جاكارو</h2><div class="latin" lang="en">JACKAROO</div><p>حرّك أحجارك عبر لوح الرخام وساعد شريكك على بلوغ الأمان.</p><div class="actions"><button class="gold" id="create">العب جاكارو <span>＋</span></button><button class="outline" data-guide="0">دليل اللعبة</button></div></div><span class="corner tl"></span></article>
+<section class="welcome" aria-labelledby="welcome-title">
+  <div class="welcomeCopy">
+    <p class="welcomeEyebrow"><span aria-hidden="true">✦</span> تجربة عربية بروح المجلس</p>
+    <h1 id="welcome-title">اللعب أحلى<br><em>في مجلسنا</em></h1>
+    <p class="welcomeLead">لحظات تنافس، ولمة أصدقاء، وطاولة تجمع الكل. اختر لعبتك، افتح مجلسك، وشارك الدعوة بخطوات بسيطة.</p>
+    <div class="welcomeActions">
+      <button class="gold welcomeJoin" type="button" id="join">انضم إلى طاولة <span aria-hidden="true">↗</span></button>
+      <button class="welcomeGuide" type="button" data-guide="0">اكتشف طريقة اللعب <span aria-hidden="true">←</span></button>
+    </div>
+    <div class="welcomeNotes" aria-label="مميزات المجلس">
+      <span><b aria-hidden="true">✓</b> شبكة محلية</span>
+      <span><b aria-hidden="true">✓</b> ألعاب جماعية</span>
+      <span><b aria-hidden="true">✓</b> دعوة برمز QR</span>
+    </div>
+  </div>
+  <div class="welcomeVisual" aria-hidden="true">
+    <div class="royalOrbit orbitOuter"></div><div class="royalOrbit orbitInner"></div>
+    <div class="royalEmblem"><span>✥</span><small>ROYAL</small><strong>مَجلس</strong></div>
+    <div class="floatingStar starOne">✧</div><div class="floatingStar starTwo">✦</div>
+    <div class="visualCorner c1"></div><div class="visualCorner c2"></div>
+  </div>
+</section>
+<section class="gamesSection" aria-labelledby="games-title">
+  <div class="libraryHead">
+    <div><div class="eyebrow dark"><b></b> اختيارات المجلس</div><h2 id="games-title">اختر لعبتك</h2><p>لكل جلسة أجواؤها، ولكل لعبة حكايتها.</p></div>
+    <span class="gamesCount"><span aria-hidden="true">✦</span> لعبتان بانتظارك</span>
+  </div>
+  <div class="collection" aria-label="ألعاب المجلس">
+    <article class="hero mercyCover" aria-labelledby="mercy-title">
+      <div class="photo" aria-hidden="true"></div><div class="gameNumber" aria-hidden="true">01 / CARDS</div>
+      <div class="heroCopy">
+        <div class="eyebrow"><b></b> أوراق وتحدّي · ٢–٦ لاعبين</div>
+        <h2 id="mercy-title">أونو لا ترحم</h2><div class="latin" lang="en">SHOW ’EM NO MERCY</div>
+        <p>المفاجآت في كل ورقة! كدّس العقوبات، بدّل الأوراق، وابقَ آخر لاعب في المجلس.</p>
+        <div class="actions"><button class="gold" type="button" id="mercyCreate">العب أونو <span aria-hidden="true">←</span></button><button class="outline" type="button" data-mercy-guide>تعرف على القواعد</button></div>
+      </div><span class="corner tl" aria-hidden="true"></span>
+    </article>
+    <article class="hero jackCover" aria-labelledby="jack-title">
+      <div class="photo" aria-hidden="true"></div><div class="gameNumber" aria-hidden="true">02 / STRATEGY</div>
+      <div class="heroCopy">
+        <div class="eyebrow"><b></b> ذكاء وشراكة · ٤ أو ٦ لاعبين</div>
+        <h2 id="jack-title">جاكارو</h2><div class="latin" lang="en">JACKAROO</div>
+        <p>خطط لحركتك، تعاون مع شريكك، واصنع لحظة الفوز في أجواء مجلس ملكية.</p>
+        <div class="actions"><button class="gold" type="button" id="create">العب جاكارو <span aria-hidden="true">←</span></button><button class="outline" type="button" data-guide="0">تعرف على القواعد</button></div>
+      </div><span class="corner tl" aria-hidden="true"></span>
+    </article>
+  </div>
+</section>
+<section class="howItWorks" aria-labelledby="steps-title">
+  <div class="stepsTitle"><span class="eyebrow dark">خطوات بسيطة</span><h2 id="steps-title">من اختيار اللعبة إلى أول حركة</h2></div>
+  <div class="stepsGrid">
+    <div class="step"><span class="stepNo">01</span><div><h3>اختر اللعبة</h3><p>ابدأ بجاكارو أو أونو لا ترحم، وحدد عدد اللاعبين.</p></div></div>
+    <div class="step"><span class="stepNo">02</span><div><h3>اجمع الأصدقاء</h3><p>شارك رابط الطاولة أو رمز الدعوة مع من حولك.</p></div></div>
+    <div class="step"><span class="stepNo">03</span><div><h3>ابدأ المنافسة</h3><p>عندما تكتمل المقاعد، تنطلق أجواء المجلس.</p></div></div>
+  </div>
 </section></main>
-<main id="room" hidden></main><footer><span>✥ &nbsp; مَجلس</span><small>صالة الألعاب المحلية</small></footer>
+<main id="room" hidden></main><footer class="site-footer"><div class="footerBrand"><span>✥</span><strong>مَجلس رويال</strong><small>اللّمة تجمعنا</small></div><small>صُمّم لتجمعات اللعب على الشبكة المحلية</small></footer>
 <dialog id="modal"><button class="close" aria-label="إغلاق">×</button><div id="dialogBody"></div></dialog><div id="toast" role="status"></div>
 <script src="/table-rules.js"></script><script src="/qrcode.js"></script><script src="/jsQR.js"></script><script src="/invite.js"></script><script src="/geometry.js"></script><script src="/board.js"></script><script src="/mercy-cards.js"></script><script src="/mercy-ui.js"></script><script src="/app.js"></script></html>
