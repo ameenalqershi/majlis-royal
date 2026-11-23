@@ -1,0 +1,98 @@
+.panel {
+  background: #fffdf7;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 22px;
+}
+.arena {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.board {
+  display: block;
+  width: 100%;
+  background: #162a24;
+  border: 4px double #a9915f;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px #162a2426;
+}
+.hand {
+  display: flex;
+  gap: 7px;
+  direction: ltr;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.card {
+  border: 1px solid #b6aa8a;
+  border-radius: 5px;
+  background: linear-gradient(150deg, #fffdf7, #eee6d2);
+  min-width: 46px;
+  padding: 8px 5px;
+  color: #17332c;
+  display: grid;
+  justify-items: center;
+  font: 22px Georgia;
+  box-shadow: 1px 2px 2px #0001;
+}
+.card.red {
+  color: #a62d44;
+}
+.card.chosen {
+  outline: 2px solid #99763c;
+  transform: translateY(-3px);
+}
+.panel h3 {
+  margin: 8px 0;
+}
+.panel .solid {
+  margin-top: 10px;
+}
+.panel hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 18px 0;
+}
+@media (max-width: 800px) {
+  .arena {
+    grid-template-columns: 1fr;
+  }
+  .board {
+    max-width: 650px;
+    margin: auto;
+  }
+}
+@media (max-width: 600px) {
+  .panel {
+    padding: 15px;
+  }
+  .arena {
+    gap: 9px;
+  }
+}
+.arena .board {
+  max-width: min(100%, max(530px, calc(100vh - 222px)));
+  margin: auto;
+}
+.arena .hand {
+  justify-content: end;
+}
+.panel .seats li {
+  font-size: 14px;
+}
+.panel h2 {
+  line-height: 1.5;
+}
+.panel .seats li {
+  font-size: 16px;
+}
+.panel h3 {
+  font-weight: 700;
+}
+@media (max-width: 600px) {
+  .panel h2 {
+    margin-bottom: 4px;
+  }
+}

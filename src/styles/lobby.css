@@ -1,0 +1,427 @@
+.roomHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 0;
+}
+.roomHead h2 {
+  margin: 0;
+}
+.lobby {
+  background: #fffdf7;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 22px;
+}
+.lobby {
+  max-width: 720px;
+  margin: 30px auto;
+}
+.seats {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.seats li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  background: #f3f0e7;
+  border-radius: 3px;
+}
+.dot {
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px #0003;
+}
+.s0 {
+  background: #29845c;
+}
+.s1 {
+  background: #b84953;
+}
+.s2 {
+  background: #3d8ea8;
+}
+.s3 {
+  background: #c69136;
+}
+.lobby input {
+  direction: ltr;
+  text-align: left;
+}
+@media (max-width: 600px) {
+  .roomHead h2 {
+    font-size: 26px;
+  }
+  .lobby {
+    padding: 15px;
+  }
+  .roomHead .light {
+    padding: 6px;
+  }
+  .roomHead {
+    margin: 12px 0;
+  }
+}
+.roomExit {
+  margin-top: 18px;
+  text-align: left;
+}
+.roomExit button {
+  font-size: 12px;
+}
+.roomHead h2 {
+  line-height: 1.5;
+}
+.inviteBox h3 {
+  font-weight: 700;
+}
+@media (max-width: 600px) {
+  .roomExit button {
+    font-size: 13px;
+  }
+  .roomHead h2 {
+    font-size: 24px;
+  }
+}
+.s4 {
+  background: #a675bd;
+}
+.s5 {
+  background: #dc825c;
+}
+.inviteBox {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  border-block: 1px solid var(--line);
+  padding: 16px 0;
+  margin: 14px 0;
+}
+.inviteBox img {
+  width: 150px;
+  height: 150px;
+  image-rendering: pixelated;
+  background: white;
+}
+.inviteBox h3 {
+  margin: 0;
+}
+.inviteBox p {
+  margin: 5px 0;
+}
+.inviteBox code {
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #67522f;
+}
+@media (max-width: 600px) {
+  .inviteBox {
+    gap: 12px;
+  }
+  .inviteBox img {
+    width: 132px;
+    height: 132px;
+  }
+}
+.inviteBox[hidden] {
+  display: none;
+}
+.seatNo {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background: #453039;
+  color: #ffe9c4;
+}
+#room {
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-block: clamp(24px, 5vw, 48px) 0;
+  padding-inline: max(var(--mj-gutter), env(safe-area-inset-right, 0px))
+    max(var(--mj-gutter), env(safe-area-inset-left, 0px));
+}
+
+#room .roomHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mj-s-3) var(--mj-s-4);
+  margin: 0 0 var(--mj-s-5);
+  padding: 0;
+}
+#room .roomHead :is(h1, h2, h3) {
+  margin: 0;
+  color: var(--mj-sand-50);
+  font: 800 var(--mj-fs-xl) / 1.35 var(--mj-font-display);
+  letter-spacing: 0;
+}
+#room .roomHead :is(p, small, span) {
+  color: var(--mj-text-soft);
+}
+#room .roomHead :is(code, kbd, .code, .roomCode, .pill) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 4px 14px;
+  border: 1px solid rgba(227, 184, 102, 0.4);
+  border-radius: var(--mj-r-sm);
+  background: var(--mj-ink-800);
+  color: var(--mj-brass-300);
+  font: 700 var(--mj-fs-md) / 1.2 var(--mj-font-display);
+  letter-spacing: 0.2em;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+#room .lobby {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mj-s-5);
+  overflow: hidden;
+  padding: clamp(16px, 4vw, 32px);
+  border: 1px solid var(--mj-line-strong);
+  border-radius: var(--mj-r-xl);
+  background: linear-gradient(180deg, var(--mj-ink-850), var(--mj-ink-900));
+  box-shadow: var(--mj-e2);
+  color: var(--mj-text);
+}
+#room .lobby::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--mj-brass-400), transparent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+#room .lobby > * {
+  min-width: 0;
+}
+#room .lobby :is(h2, h3) {
+  margin: 0;
+  color: var(--mj-sand-50);
+  font: 800 var(--mj-fs-lg) / 1.4 var(--mj-font-display);
+  letter-spacing: 0;
+}
+#room .lobby p {
+  margin: 0;
+  color: var(--mj-text-soft);
+  font: 500 var(--mj-fs-md) / 1.8 var(--mj-font-ui);
+}
+
+@media (min-width: 900px) {
+  #room .lobby:has(> .seats):has(> .inviteBox) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+    align-items: start;
+  }
+  #room .lobby:has(> .seats):has(> .inviteBox) > :not(.seats):not(.inviteBox) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Seats */
+#room .lobby .seats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 132px), 1fr));
+  gap: var(--mj-s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#room .lobby .seats > :is(*, button) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 108px;
+  margin: 0;
+  padding: 16px 10px;
+  border: 1.5px solid var(--mj-line-strong);
+  border-radius: var(--mj-r-lg);
+  background: rgba(244, 233, 211, 0.05);
+  box-shadow: none;
+  color: var(--mj-text);
+  font: 700 var(--mj-fs-md) / 1.4 var(--mj-font-ui);
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition:
+    border-color var(--mj-dur) var(--mj-ease),
+    background-color var(--mj-dur) var(--mj-ease),
+    box-shadow var(--mj-dur) var(--mj-ease);
+}
+#room .lobby .seats > * :is(small, span:not(:first-child), em) {
+  color: var(--mj-text-soft);
+  font: 500 var(--mj-fs-xs) / 1.5 var(--mj-font-ui);
+  font-style: normal;
+}
+#room .lobby .seats > * :is(b, strong) {
+  color: var(--mj-sand-50);
+  font: 700 var(--mj-fs-md) / 1.4 var(--mj-font-display);
+}
+
+/* Empty seat — dashed, recessive */
+#room
+  .lobby
+  .seats
+  > :is(.empty, .free, .open, .vacant, .waiting, [data-empty], [data-state='empty']) {
+  border-style: dashed;
+  border-color: rgba(244, 233, 211, 0.26);
+  background: transparent;
+  color: var(--mj-text-mute);
+}
+#room
+  .lobby
+  .seats
+  > :is(.empty, .free, .open, .vacant, .waiting, [data-empty], [data-state='empty'])
+  * {
+  color: var(--mj-text-mute);
+}
+
+/* Taken seat */
+#room
+  .lobby
+  .seats
+  > :is(.taken, .filled, .occupied, .joined, .ready, .on, .host, .you, .me, .mine, .self) {
+  border-color: rgba(227, 184, 102, 0.5);
+  background: linear-gradient(180deg, rgba(227, 184, 102, 0.1), rgba(227, 184, 102, 0.03));
+}
+#room
+  .lobby
+  .seats
+  > :is(.taken, .filled, .occupied, .joined, .ready, .on, .host, .you, .me, .mine, .self)::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mj-jade);
+  box-shadow: 0 0 0 3px rgba(92, 208, 164, 0.2);
+}
+/* The player's own seat */
+#room .lobby .seats > :is(.you, .me, .mine, .self) {
+  border-color: var(--mj-brass-400);
+  box-shadow: 0 0 0 4px rgba(227, 184, 102, 0.16);
+}
+
+/* Invitation */
+#room .inviteBox {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--mj-s-4);
+  padding: var(--mj-s-5);
+  border: 1px solid var(--mj-line-strong);
+  border-radius: var(--mj-r-lg);
+  background: linear-gradient(180deg, rgba(244, 233, 211, 0.06), rgba(244, 233, 211, 0.02));
+  text-align: center;
+}
+#room .inviteBox > :is(canvas, img, svg),
+#room .inviteBox :is(.qr, [class*='qr']) :is(canvas, img, svg) {
+  display: block;
+  width: min(100%, 224px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  padding: 12px;
+  border-radius: var(--mj-r-md);
+  background: #ffffff; /* QR needs a light quiet zone to scan */
+  box-shadow:
+    0 16px 32px -16px rgba(0, 0, 0, 0.8),
+    0 0 0 4px rgba(227, 184, 102, 0.35);
+}
+#room .inviteBox :is(h2, h3, h4) {
+  margin: 0;
+  color: var(--mj-sand-50);
+  font: 800 var(--mj-fs-lg) / 1.4 var(--mj-font-display);
+}
+#room .inviteBox :is(code, .code, .roomCode) {
+  display: inline-block;
+  padding: 6px 16px;
+  border: 1px dashed rgba(227, 184, 102, 0.5);
+  border-radius: var(--mj-r-sm);
+  background: var(--mj-ink-900);
+  color: var(--mj-brass-300);
+  font: 700 1.5rem/1.3 var(--mj-font-display);
+  letter-spacing: 0.3em;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+#room .inviteBox :is(p, small) {
+  margin: 0;
+  color: var(--mj-text-soft);
+  font: 500 var(--mj-fs-sm) / 1.7 var(--mj-font-ui);
+}
+#room .inviteBox > button {
+  width: 100%;
+}
+#room .inviteBox :is(.actions, .row, .share) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+/* Empty / waiting states */
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  :is(.emptyState, .empty-state, .noResults) {
+  display: grid;
+  justify-items: center;
+  gap: var(--mj-s-2);
+  padding: var(--mj-s-7) var(--mj-s-5);
+  border: 1.5px dashed var(--mj-line-strong);
+  border-radius: var(--mj-r-lg);
+  color: var(--mj-text-soft);
+  text-align: center;
+}
+
+@media (max-width: 380px) {
+  #room .lobby .seats {
+    gap: 8px;
+  }
+  #room .lobby .seats > :is(*, button) {
+    min-height: 96px;
+    padding-inline: 6px;
+  }
+  #room .inviteBox {
+    padding: var(--mj-s-4);
+  }
+}
+#room .roomHead {
+  background-color: var(--mj-ink-900);
+  border-radius: var(--mj-r-md);
+  padding: 14px 18px;
+}
+#room .inviteBox .field {
+  width: 100%;
+  text-align: start;
+}
+#room .lobby .seats strong {
+  overflow-wrap: anywhere;
+}
+#room .lobby {
+  max-width: none;
+}
+#room select[dir='ltr'] {
+  background-position: right 1rem center;
+}

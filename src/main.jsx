@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import '../core/table-rules';
-import '../core/mercy-cards';
 import { useTable, request } from './core/useTable';
 import { Lounge } from './Lounge';
 import { Lobby } from './Lobby';
@@ -11,9 +9,7 @@ import { Scanner } from './Scanner';
 import { JackarooGuide, MercyGuide } from './Guides';
 import { Jackaroo } from './jackaroo/Jackaroo';
 import { Mercy } from './mercy/Mercy';
-import './style.css';
-import './mercy.css';
-import './opus-ui.css';
+import './styles/index.css';
 
 const initialInvite = new URLSearchParams(location.search).get('room')?.toUpperCase();
 const hostLocal = ['127.0.0.1', 'localhost'].includes(location.hostname);

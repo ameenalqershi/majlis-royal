@@ -1,15 +1,106 @@
 name: Majlis checks
-on: [push, pull_request]
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
 permissions:
   contents: read
+
 jobs:
-  game:
+  web:
+    name: Game rules and browser play
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test test/*.test.mjs
+          cache: npm
       - run: npm ci
+      - run: npm test
       - run: npm run build
+      - name: Play both games through the production host
+        shell: bash
+        run: |
+          node server.mjs > build-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          curl -fsS --retry 20 --retry-connrefused --retry-delay 1 http://127.0.0.1:8787/ >/dev/null
+          CHROME="$(command -v google-chrome)" npm run test:ui
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-checks
+          path: |
+            build/previews/
+            build-server.log
+          retention-days: 7
+
+  android:
+    name: Android package and emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: npm ci
+      - name: Install Android build tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
+      - run: npm run android
+      - name: Verify the published APK
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir -p build/published
+          gh release download "$RELEASE_TAG" --pattern '*.apk' --dir build/published
+          apks=(build/published/*.apk)
+          test "${#apks[@]}" -eq 1
+          signer="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$signer" verify --verbose "${apks[0]}"
+          "$signer" verify --print-certs "${apks[0]}" | grep -F 'certificate SHA-256 digest: 6d7a0fbd81bf3b5c06545f49a6f82ac87aa8d2047a00e263249dd58e9405d1f3'
+          echo "APK_TO_TEST=${apks[0]}" >> "$GITHUB_ENV"
+      - name: Enable hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and exercise the APK on Android 15
+        uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: node scripts/check-android.mjs "${APK_TO_TEST:-build/android/majlis.apk}"
+      - name: Upload tested APK
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: majlis-ci-apk
+          path: build/android/majlis.apk
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload Android diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-diagnostics
+          path: build/android/diagnostics/
+          if-no-files-found: ignore
+          retention-days: 7

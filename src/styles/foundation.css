@@ -1,0 +1,221 @@
+@font-face {
+  font-family: Alexandria;
+  src: url('/alexandria.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: Tajawal;
+  src: url('/tajawal-Medium.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: Tajawal;
+  src: url('/tajawal-Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+:root {
+  --ink: #172d26;
+  --green: #102d26;
+  --paper: #f7f4ed;
+  --gold: #e2c58d;
+  --line: #d8d1c0;
+  --muted: #646c61;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    16px/1.6 Tahoma,
+    Arial,
+    sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #ac863d;
+  outline-offset: 3px;
+}
+button {
+  color: inherit;
+}
+main {
+  width: min(1260px, 92%);
+  margin: auto;
+}
+.eyebrow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #e7c998;
+}
+.eyebrow b {
+  width: 30px;
+  height: 1px;
+  background: currentColor;
+}
+.eyebrow span {
+  opacity: 0.5;
+}
+button:hover {
+  filter: brightness(0.95);
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.dark {
+  color: #826e48;
+}
+h2 {
+  font:
+    bold 36px/1.35 Georgia,
+    serif;
+  margin: 5px 0 16px;
+}
+.hint {
+  color: var(--muted);
+  font-size: 14px;
+}
+body {
+  font-family: Tajawal, sans-serif;
+  font-weight: 500;
+  line-height: 1.65;
+}
+h2 {
+  font-family: Alexandria, sans-serif;
+  font-weight: 650;
+}
+.hint {
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  .eyebrow {
+    font-size: 13px;
+  }
+}
+:is(
+  #root > :where(header),
+  #landing,
+  #modal,
+  #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+),
+#root > footer,
+#toast {
+  font-family: var(--mj-font-ui);
+  line-height: 1.6;
+  color: var(--mj-text);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:is(
+  #root > :where(header),
+  #landing,
+  #modal,
+  #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+),
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  *,
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  *::before,
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  *::after,
+#root > footer,
+#root > footer *,
+#toast {
+  box-sizing: border-box;
+}
+
+/* Page backdrop — ONLY while the lobby/landing shell is on screen, so the
+   in-game surround is left exactly as the original stylesheets define it. */
+body:has(#landing:not([hidden])),
+body:has(#room:not([hidden]) .lobby) {
+  color-scheme: dark;
+  background-color: var(--mj-bg);
+  background-image:
+    radial-gradient(90% 520px at 50% -80px, rgba(60, 67, 128, 0.55), transparent 70%),
+    radial-gradient(60% 420px at 100% 30%, rgba(185, 60, 37, 0.1), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23f4e9d3' stroke-opacity='.055' stroke-width='1'%3E%3Cpath d='M28 4 52 28 28 52 4 28Z'/%3E%3Crect x='11' y='11' width='34' height='34'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size:
+    auto,
+    auto,
+    56px 56px;
+}
+
+::selection {
+  background: rgba(227, 184, 102, 0.35);
+  color: #fff;
+}
+
+/* [hidden] must always win inside the shell */
+#landing[hidden],
+#room[hidden],
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  [hidden] {
+  display: none !important;
+}
+
+/* Focus ring (links, tabbables) */
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  a:focus-visible,
+:is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  )
+  [tabindex]:focus-visible,
+#root > footer a:focus-visible {
+  outline: 3px solid var(--mj-focus);
+  outline-offset: 3px;
+  border-radius: var(--mj-r-xs);
+}

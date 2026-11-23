@@ -1,3 +1,4 @@
+import { TableRules } from '../../core/table-rules.js';
 import { makeBoardGeometry } from './geometry.js';
 const marbleSurface=new Image();
 marbleSurface.src='/marble.png';

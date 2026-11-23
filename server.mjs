@@ -1,13 +1,7 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {networkInterfaces} from 'node:os';
-import {webcrypto} from 'node:crypto';
-import './core/table-rules.js';
-import './core/game.js';
-import './core/mercy-cards.js';
-import './core/mercy.js';
-import './core/rooms.js';
-if(!globalThis.crypto) globalThis.crypto=webcrypto;
+import { request } from './core/rooms.js';
 const port=Number(process.env.PORT || 8787);
 const isPrivate=ip=>/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
 const urls=()=>Object.values(networkInterfaces()).flat().filter(a=>a.family==='IPv4'&&!a.internal).sort((a,b)=>Number(isPrivate(b.address))-Number(isPrivate(a.address))).map(a=>'http://'+a.address+':'+port);
@@ -27,7 +21,7 @@ const server=http.createServer(async(req,res)=>{
       }
       const body=Buffer.concat(chunks).toString('utf8');
       const action=path.slice(5);
-      const value=action==='network'?{urls:urls()}:Majlis.request(action,JSON.parse(body));
+      const value=action==='network'?{urls:urls()}:request(action,JSON.parse(body));
       res.setHeader('Content-Type','application/json');
       return res.end(JSON.stringify(value));
     }

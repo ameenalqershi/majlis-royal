@@ -1,0 +1,403 @@
+header {
+  background: #fcfaf5;
+  border-bottom: 1px solid var(--line);
+}
+.bar,
+footer {
+  width: min(1260px, 92%);
+  margin: auto;
+}
+.bar {
+  height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-decoration: none;
+}
+.brand span {
+  font:
+    bold 34px/0.92 Georgia,
+    serif;
+}
+.brand small {
+  display: block;
+  font: 9px/1.4 Georgia;
+  letter-spacing: 4px;
+  margin-top: 5px;
+}
+.seal {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: #a0844c;
+  font: 35px Georgia;
+}
+.seal:before,
+.seal:after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid #ab905f;
+  transform: rotate(45deg);
+}
+.seal:after {
+  transform: rotate(0);
+}
+nav {
+  display: flex;
+  height: 100%;
+  gap: 30px;
+}
+nav button,
+.network {
+  background: none;
+  border: none;
+  font-size: 14px;
+}
+nav button:first-child {
+  border-bottom: 2px solid #937844;
+  font-weight: bold;
+}
+.network {
+  margin-inline-start: auto;
+  border: 1px solid var(--line);
+  padding: 5px 15px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.network i {
+  width: 7px;
+  height: 7px;
+  background: #587d5d;
+  border-radius: 50%;
+}
+footer {
+  margin: 36px auto 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 0;
+  color: #74766a;
+}
+footer span {
+  font: 20px Georgia;
+}
+footer small {
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .bar {
+    gap: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .bar {
+    height: 65px;
+    gap: 12px;
+  }
+  .brand {
+    gap: 6px;
+  }
+  .brand span {
+    font-size: 27px;
+  }
+  .seal {
+    width: 32px;
+    height: 32px;
+    font-size: 26px;
+  }
+  nav {
+    gap: 0;
+  }
+  nav button {
+    font-size: 12px;
+    padding: 4px;
+  }
+  nav button:first-child {
+    display: none;
+  }
+  .network {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  footer {
+    margin-top: 24px;
+  }
+}
+.brand span,
+footer span {
+  font-family: Alexandria, sans-serif;
+  font-weight: 650;
+}
+.brand span {
+  font-weight: 700;
+  line-height: 1.25;
+}
+@media (max-width: 600px) {
+  .network {
+    font-size: 13px;
+  }
+  .bar {
+    gap: 8px;
+  }
+}
+#root > header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 50;
+  padding-block-start: env(safe-area-inset-top, 0px);
+  background: rgba(10, 12, 27, 0.94);
+  border-block-end: 1px solid var(--mj-line);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+#root > header::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(227, 184, 102, 0.55), transparent);
+  pointer-events: none;
+}
+
+#root > header .bar {
+  height: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'brand net'
+    'nav   nav';
+  align-items: center;
+  gap: 10px 12px;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) 12px
+    max(16px, env(safe-area-inset-left, 0px));
+}
+
+/* Logo */
+#root > header .brand {
+  grid-area: brand;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--mj-sand-50);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#root > header .brand:focus-visible {
+  outline: 3px solid var(--mj-focus);
+  outline-offset: 4px;
+  border-radius: var(--mj-r-sm);
+}
+
+/* The seal: brass eight-point star holding a terracotta eight-point star */
+#root > header .seal {
+  --star: polygon(
+    50% 0%,
+    64.9% 14%,
+    85.4% 14.6%,
+    86% 35.1%,
+    100% 50%,
+    86% 64.9%,
+    85.4% 85.4%,
+    64.9% 86%,
+    50% 100%,
+    35.1% 86%,
+    14.6% 85.4%,
+    14% 64.9%,
+    0% 50%,
+    14% 35.1%,
+    14.6% 14.6%,
+    35.1% 14%
+  );
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(145deg, var(--mj-brass-300), var(--mj-brass-500));
+  clip-path: var(--star);
+  color: var(--mj-sand-50);
+  font: normal 700 1.125rem/1 var(--mj-font-display);
+  isolation: isolate;
+}
+#root > header .seal::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  background: linear-gradient(160deg, var(--mj-sadu-500), var(--mj-sadu-700));
+  clip-path: var(--star);
+}
+
+#root > header .brand span {
+  display: flex;
+  flex-direction: column;
+  font: 800 1.5rem/1.3 var(--mj-font-display);
+  letter-spacing: 0;
+  color: var(--mj-sand-50);
+}
+#root > header .brand small {
+  display: block;
+  margin-block-start: 2px;
+  color: var(--mj-brass-400);
+  font: 600 var(--mj-fs-2xs) / 1 var(--mj-font-display);
+  letter-spacing: 0.46em;
+  text-transform: uppercase;
+}
+
+/* Primary navigation — a segmented track */
+#root > header nav {
+  grid-area: nav;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--mj-line);
+  border-radius: var(--mj-r-pill);
+  background: rgba(244, 233, 211, 0.05);
+}
+#root > header nav button {
+  --b-bg: transparent;
+  --b-bg-h: rgba(244, 233, 211, 0.09);
+  --b-bg-a: rgba(244, 233, 211, 0.05);
+  --b-fg: var(--mj-sand-300);
+  --b-bd: transparent;
+  --b-bd-h: transparent;
+  flex: 1 1 0;
+  min-height: 44px;
+  padding: 0.4rem 1.1rem;
+  border-radius: var(--mj-r-pill);
+  font-size: var(--mj-fs-sm);
+}
+#root
+  > header
+  nav
+  button:is(.on, .active, .sel, [aria-current], [aria-selected='true'], [aria-pressed='true']) {
+  --b-bg: var(--mj-sand-100);
+  --b-bg-h: var(--mj-sand-50);
+  --b-bg-a: var(--mj-sand-300);
+  --b-fg: var(--mj-ink-900);
+}
+
+/* Network status pill */
+#root > header .network {
+  --b-bg: rgba(244, 233, 211, 0.05);
+  --b-bg-h: rgba(244, 233, 211, 0.11);
+  --b-bd: var(--mj-line-strong);
+  grid-area: net;
+  justify-self: end;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0.3rem 1rem;
+  border-radius: var(--mj-r-pill);
+  color: var(--mj-sand-50);
+  font-size: var(--mj-fs-sm);
+  font-weight: 600;
+}
+#root > header .network i {
+  position: relative;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mj-jade);
+  box-shadow: 0 0 0 4px rgba(92, 208, 164, 0.18);
+  animation: mj-pulse 2.6s ease-in-out infinite;
+}
+#root
+  > header
+  .network:is(.off, .offline, .bad, .down, [data-state='off'], [data-state='offline'])
+  i {
+  background: var(--mj-danger);
+  box-shadow: 0 0 0 4px rgba(255, 154, 138, 0.18);
+  animation: none;
+}
+
+@media (min-width: 640px) {
+  #root > header .bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'brand nav net';
+    gap: 16px;
+    padding-block: 12px;
+  }
+  #root > header nav {
+    justify-self: center;
+    width: auto;
+  }
+  #root > header nav button {
+    flex: 0 0 auto;
+    padding-inline: 1.4rem;
+  }
+}
+
+@media (max-width: 380px) {
+  #root > header .bar {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  #root > header .seal {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+  #root > header .brand {
+    gap: 10px;
+  }
+  #root > header .brand span {
+    font-size: 1.35rem;
+  }
+  #root > header .network {
+    padding-inline: 0.8rem;
+    gap: 8px;
+    font-size: var(--mj-fs-xs);
+  }
+  #root > header nav button {
+    padding-inline: 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+#root > footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-block-start: clamp(36px, 7vw, 72px);
+  padding: 28px max(16px, env(safe-area-inset-right, 0px))
+    calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  border-block-start: 1px solid var(--mj-line);
+  background: linear-gradient(180deg, transparent, rgba(10, 12, 27, 0.9));
+  text-align: center;
+}
+#root > footer span {
+  color: var(--mj-sand-300);
+  font: 800 var(--mj-fs-md) / 1.5 var(--mj-font-display);
+}
+#root > footer small {
+  color: var(--mj-text-mute);
+  font: 500 var(--mj-fs-sm) / 1.5 var(--mj-font-ui);
+}
+#root > footer small::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-inline-end: 14px;
+  background: var(--mj-brass-500);
+  transform: rotate(45deg);
+  vertical-align: middle;
+}

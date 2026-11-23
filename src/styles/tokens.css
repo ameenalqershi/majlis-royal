@@ -1,0 +1,84 @@
+:root {
+  /* — Ink (night indigo) — */
+  --mj-ink-950: #0a0c1b;
+  --mj-ink-900: #10132a;
+  --mj-ink-850: #161a37;
+  --mj-ink-800: #1d2244;
+  --mj-ink-700: #2a305e;
+  --mj-ink-600: #3c4380;
+
+  /* — Sand (parchment) — */
+  --mj-sand-50: #fbf6ea;
+  --mj-sand-100: #f4e9d3;
+  --mj-sand-300: #d8cdb6;
+  --mj-sand-500: #a9a5bc;
+
+  /* — Sadu (terracotta action colour) — */
+  --mj-sadu-700: #9a3320;
+  --mj-sadu-600: #b93c25;
+  --mj-sadu-500: #c84630;
+  --mj-sadu-300: #ff7a5c;
+
+  /* — Brass (detail only) — */
+  --mj-brass-300: #f0d08a;
+  --mj-brass-400: #e3b866;
+  --mj-brass-500: #c99a43;
+
+  /* — Status — */
+  --mj-jade: #5cd0a4;
+  --mj-danger: #ff9a8a;
+
+  /* — Semantic surfaces — */
+  --mj-bg: var(--mj-ink-950);
+  --mj-surface: var(--mj-ink-850);
+  --mj-surface-sunk: var(--mj-ink-950);
+  --mj-surface-raise: var(--mj-ink-800);
+  --mj-line: rgba(244, 233, 211, 0.1);
+  --mj-line-strong: rgba(244, 233, 211, 0.22);
+  --mj-text: var(--mj-sand-50);
+  --mj-text-soft: var(--mj-sand-300);
+  --mj-text-mute: var(--mj-sand-500);
+  --mj-focus: var(--mj-brass-300);
+
+  /* — Typography — */
+  --mj-font-display:
+    'Alexandria', 'Tajawal', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --mj-font-ui: 'Tajawal', 'Alexandria', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+
+  --mj-fs-2xs: 0.6875rem; /* 11 · latin captions     */
+  --mj-fs-xs: 0.75rem; /* 12 · hints              */
+  --mj-fs-sm: 0.875rem; /* 14 · labels             */
+  --mj-fs-md: 1rem; /* 16 · body / controls    */
+  --mj-fs-lg: 1.125rem; /* 18 · lead               */
+  --mj-fs-xl: clamp(1.375rem, 4.5vw, 1.625rem); /* dialog + room titles    */
+  --mj-fs-2xl: clamp(1.9rem, 6.2vw, 2.75rem); /* game card titles        */
+  --mj-fs-3xl: clamp(2.1rem, 7.5vw, 3.5rem); /* page title              */
+
+  /* — Spacing (4 pt grid) — */
+  --mj-s-1: 4px;
+  --mj-s-2: 8px;
+  --mj-s-3: 12px;
+  --mj-s-4: 16px;
+  --mj-s-5: 20px;
+  --mj-s-6: 24px;
+  --mj-s-7: 32px;
+  --mj-s-8: 48px;
+  --mj-gutter: clamp(16px, 4vw, 40px);
+
+  /* — Radii — */
+  --mj-r-xs: 8px;
+  --mj-r-sm: 12px;
+  --mj-r-md: 14px;
+  --mj-r-lg: 20px;
+  --mj-r-xl: 28px;
+  --mj-r-pill: 999px;
+
+  /* — Elevation — */
+  --mj-e1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 6px 16px -8px rgba(0, 0, 0, 0.6);
+  --mj-e2: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 48px -24px rgba(0, 0, 0, 0.75);
+  --mj-e3: 0 40px 80px -24px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(244, 233, 211, 0.06);
+
+  /* — Motion — */
+  --mj-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mj-dur: 180ms;
+}

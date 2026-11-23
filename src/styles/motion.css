@@ -1,0 +1,125 @@
+@keyframes mj-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes mj-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(92, 208, 164, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(92, 208, 164, 0);
+  }
+}
+@keyframes mj-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mj-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mj-sheet {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes mj-toast {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    #root > :where(header),
+    #landing,
+    #modal,
+    #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+  ),
+  :is(
+      #root > :where(header),
+      #landing,
+      #modal,
+      #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+    )
+    *,
+  :is(
+      #root > :where(header),
+      #landing,
+      #modal,
+      #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+    )
+    *::before,
+  :is(
+      #root > :where(header),
+      #landing,
+      #modal,
+      #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+    )
+    *::after,
+  #toast,
+  #modal::backdrop {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  #landing .hero:hover,
+  #landing .hero:hover .photo {
+    transform: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :is(
+    :is(
+        #root > :where(header),
+        #landing,
+        #modal,
+        #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+      )
+      :where(button),
+    #room :where(button.roomExit, a.roomExit)
+  ) {
+    border-color: ButtonText;
+  }
+  :is(
+    :is(
+        #root > :where(header),
+        #landing,
+        #modal,
+        #room :where(.roomHead, .lobby, .inviteBox, .roomExit)
+      )
+      :where(button),
+    #room :where(button.roomExit, a.roomExit)
+  ):focus-visible {
+    outline-color: Highlight;
+  }
+  #landing .hero,
+  #room .lobby,
+  #modal {
+    border-color: CanvasText;
+  }
+}

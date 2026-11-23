@@ -1,8 +1,8 @@
+import { TableRules } from '../core/table-rules.js';
+import * as Jackaroo from '../core/game.js';
+import { request } from '../core/rooms.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import '../core/table-rules.js';
-import '../core/game.js';
-import '../core/rooms.js';
 const empty=()=>Array(16).fill(-1);
 const opts=(b,c)=>Jackaroo.options(b,0,c);
 test('release and protected base',()=>{
@@ -31,7 +31,7 @@ test('partner takeover and victory',()=>{
   assert.throws(()=>Jackaroo.play(g,0,0,0));
 });
 test('rooms, hidden hands, authorization, stale actions and reconnect',()=>{
-  const req=Majlis.request;
+  const req=request;
   const host=req('create',{name:'المضيف'}),users=[host];
   assert.throws(()=>req('start',host));
   for(let i=1;i<4;i++)users.push(req('join',{name:'لاعب '+i,code:host.code}));
@@ -69,12 +69,12 @@ test('complete seeded games without duplicate occupied holes',()=>{
   }finally{Math.random=orig;}
 });
 test('leaving a lobby releases a seat, closing a table invalidates the invite',()=>{
-  const req=Majlis.request,h=req('create',{name:'ليلى'}),u=req('join',{code:h.code,name:'فارس'});
+  const req=request,h=req('create',{name:'ليلى'}),u=req('join',{code:h.code,name:'فارس'});
   req('leave',u);assert.equal(req('state',h).players.length,1);
   req('leave',h);assert.throws(()=>req('state',h));
 });
 test('six players need six seats, opposite partners, equal deals and 108 track holes',()=>{
-  const req=Majlis.request;
+  const req=request;
   assert.throws(()=>req('create',{name:'أمل',capacity:5}));
   const h=req('create',{name:'هند',capacity:6});
   for(let i=1;i<=5;i++){

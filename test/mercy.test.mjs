@@ -1,8 +1,7 @@
+import * as Mercy from '../core/mercy.js';
+import { request } from '../core/rooms.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import '../core/mercy-cards.js';
-import '../core/mercy.js';
-import '../core/rooms.js';
 const play=(g,i,data={})=>Mercy.act(g,g.turn,{move:'card',card:i,...data});
 function table(hands){
   return {...Mercy.start(hands.length),hands,discard:['r3'],color:'r'};
@@ -41,11 +40,11 @@ test('25-card elimination and last survivor',()=>{
   assert.equal(g.winner,0);assert.equal(g.reserve.length,25);
 });
 test('private room views and stale turn rejection',()=>{
-  const h=Majlis.request('create',{kind:'mercy',capacity:2,name:'أمل'});
-  const u=Majlis.request('join',{code:h.code,name:'فارس'});const s=Majlis.request('start',h);
+  const h=request('create',{kind:'mercy',capacity:2,name:'أمل'});
+  const u=request('join',{code:h.code,name:'فارس'});const s=request('start',h);
   assert.equal(s.game.hand.length,7);assert.equal(s.game.hands,undefined);assert.equal(s.game.pile,undefined);
-  assert.throws(()=>Majlis.request('play',{...u,rev:s.rev,move:'draw'}));
-  assert.throws(()=>Majlis.request('play',{...h,rev:s.rev-1,move:'draw'}));
+  assert.throws(()=>request('play',{...u,rev:s.rev,move:'draw'}));
+  assert.throws(()=>request('play',{...h,rev:s.rev-1,move:'draw'}));
 });
 test('full games at every capacity conserve all 168 cards on every turn',()=>{
   for(let seats=2;seats<=6;seats++)for(let trial=0;trial<8;trial++){

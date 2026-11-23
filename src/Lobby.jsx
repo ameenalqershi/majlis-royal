@@ -1,3 +1,4 @@
+import { TableRules } from '../core/table-rules.js';
 import { useMemo, useRef } from 'react';
 import { inviteImage } from './core/invite';
 

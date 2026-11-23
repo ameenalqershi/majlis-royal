@@ -1,0 +1,295 @@
+dialog {
+  border: 1px solid #bfa979;
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 34px;
+  width: min(460px, 92vw);
+  max-height: 86vh;
+  box-shadow: 0 24px 90px #07171066;
+}
+dialog::backdrop {
+  background: #0b211bd1;
+}
+.close {
+  float: left;
+  border: 0;
+  background: transparent;
+  font-size: 27px;
+}
+.err {
+  color: #9b3331;
+}
+.guideTabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.guideTabs button {
+  padding: 5px 10px;
+}
+.guideTabs .on {
+  background: #e1d9c6;
+}
+dialog h2 {
+  line-height: 1.5;
+}
+.scanTools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.scanTools label {
+  cursor: pointer;
+}
+.scanVideo {
+  display: block;
+  width: 100%;
+  max-height: 40vh;
+  object-fit: contain;
+  background: #183529;
+}
+.scanVideo[hidden] {
+  display: none;
+}
+#modal {
+  position: fixed;
+  inset: 0;
+  width: min(560px, calc(100% - 24px));
+  max-width: none;
+  max-height: min(88vh, 760px);
+  max-height: min(88dvh, 760px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mj-line-strong);
+  border-radius: var(--mj-r-xl);
+  background: linear-gradient(180deg, var(--mj-ink-800), var(--mj-ink-850));
+  box-shadow: var(--mj-e3);
+  color: var(--mj-text);
+}
+#modal:not([open]) {
+  display: none;
+}
+#modal[open] {
+  display: flex;
+  flex-direction: column;
+  animation: mj-pop 260ms var(--mj-ease) both;
+}
+#modal::backdrop {
+  background: rgba(6, 7, 16, 0.76);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+#modal::before {
+  content: '';
+  flex: none;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--mj-sadu-600),
+    var(--mj-brass-400) 50%,
+    var(--mj-sadu-600)
+  );
+}
+
+#modal .close {
+  --b-bg: rgba(244, 233, 211, 0.08);
+  --b-bg-h: rgba(244, 233, 211, 0.18);
+  --b-bd: var(--mj-line);
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-end: 14px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  font: 400 1.75rem/1 var(--mj-font-ui);
+}
+
+#dialogBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mj-ink-600) transparent;
+  padding: var(--mj-s-6) clamp(18px, 4vw, 32px)
+    calc(var(--mj-s-6) + env(safe-area-inset-bottom, 0px));
+  color: var(--mj-text);
+}
+#dialogBody > :first-child {
+  margin-block-start: 0;
+}
+#dialogBody > :is(h1, h2, h3):first-child {
+  padding-inline-end: 52px;
+}
+
+#dialogBody :is(h1, h2) {
+  margin: 0 0 var(--mj-s-2);
+  color: var(--mj-sand-50);
+  font: 800 var(--mj-fs-xl) / 1.4 var(--mj-font-display);
+  letter-spacing: 0;
+}
+#dialogBody h3 {
+  margin: var(--mj-s-6) 0 var(--mj-s-2);
+  color: var(--mj-brass-300);
+  font: 700 var(--mj-fs-lg) / 1.5 var(--mj-font-display);
+  letter-spacing: 0;
+}
+#dialogBody p {
+  margin: 0 0 var(--mj-s-3);
+  color: var(--mj-text-soft);
+  font: 500 var(--mj-fs-md) / 1.9 var(--mj-font-ui);
+}
+#dialogBody :is(ul, ol) {
+  margin: 0 0 var(--mj-s-4);
+  padding-inline-start: 1.4em;
+  color: var(--mj-text-soft);
+  line-height: 1.9;
+}
+#dialogBody li {
+  margin-block: var(--mj-s-2);
+  padding-inline-start: 0.2em;
+}
+#dialogBody li::marker {
+  color: var(--mj-brass-400);
+  font-weight: 700;
+}
+#dialogBody :is(b, strong) {
+  color: var(--mj-sand-50);
+  font-weight: 700;
+}
+#dialogBody hr {
+  height: 1px;
+  margin: var(--mj-s-5) 0;
+  border: 0;
+  background: var(--mj-line);
+}
+#dialogBody :is(code, kbd) {
+  padding: 1px 8px;
+  border-radius: var(--mj-r-xs);
+  background: var(--mj-ink-950);
+  color: var(--mj-brass-300);
+  font: 600 0.9em/1.6 var(--mj-font-display);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+#dialogBody table {
+  width: 100%;
+  margin: 0 0 var(--mj-s-4);
+  border-collapse: collapse;
+  font-size: var(--mj-fs-sm);
+}
+#dialogBody :is(th, td) {
+  padding: 10px 8px;
+  border-block-end: 1px solid var(--mj-line);
+  text-align: start;
+}
+#dialogBody th {
+  color: var(--mj-brass-300);
+  font-weight: 700;
+}
+
+/* Dialog actions */
+#modal :is(.actions, .row.actions, .buttons) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: var(--mj-s-6) 0 0;
+}
+#modal :is(.actions, .buttons) > :is(.gold, .primary) {
+  flex: 1 1 160px;
+}
+#modal :is(.actions, .buttons) > :not(.gold):not(.primary) {
+  flex: 0 1 auto;
+}
+
+/* Guide tabs — segmented control */
+#modal .guideTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 var(--mj-s-5);
+  padding: 4px;
+  border: 1px solid var(--mj-line);
+  border-radius: var(--mj-r-md);
+  background: rgba(10, 12, 27, 0.55);
+}
+#modal .guideTabs button {
+  --b-bg: transparent;
+  --b-bg-h: rgba(244, 233, 211, 0.09);
+  --b-bg-a: rgba(244, 233, 211, 0.05);
+  --b-fg: var(--mj-sand-300);
+  --b-bd: transparent;
+  --b-bd-h: transparent;
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  border-radius: var(--mj-r-sm);
+  font-size: 0.9375rem;
+}
+#modal
+  .guideTabs
+  button:is(.on, .active, .sel, [aria-selected='true'], [aria-pressed='true'], [aria-current]) {
+  --b-bg: var(--mj-sand-100);
+  --b-bg-h: var(--mj-sand-50);
+  --b-bg-a: var(--mj-sand-300);
+  --b-fg: var(--mj-ink-900);
+}
+
+/* QR scanning tools */
+#modal .scanTools {
+  display: grid;
+  gap: var(--mj-s-3);
+  margin: 0 0 var(--mj-s-5);
+  padding: var(--mj-s-4);
+  border: 1.5px dashed var(--mj-line-strong);
+  border-radius: var(--mj-r-lg);
+  background: rgba(10, 12, 27, 0.45);
+}
+#modal .scanTools video {
+  display: block;
+  width: 100%;
+  max-height: min(48vh, 320px);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 1px solid var(--mj-line);
+  border-radius: var(--mj-r-md);
+  background: #000;
+}
+#modal .scanTools > :is(div, .row, .actions) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+#modal .scanTools button {
+  width: 100%;
+}
+
+/* Phone: bottom sheet */
+@media (max-width: 559px) {
+  #modal {
+    width: 100%;
+    margin: auto 0 0;
+    max-height: calc(100vh - 24px - env(safe-area-inset-top, 0px));
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px));
+    border-inline: 0;
+    border-block-end: 0;
+    border-radius: var(--mj-r-xl) var(--mj-r-xl) 0 0;
+  }
+  #modal[open] {
+    animation: mj-sheet 300ms var(--mj-ease) both;
+  }
+  #modal :is(.actions, .buttons) > * {
+    flex: 1 1 100%;
+  }
+}
+#modal .err:not(:empty) {
+  color: var(--mj-danger);
+}

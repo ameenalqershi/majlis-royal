@@ -1,3 +1,4 @@
+import { TableRules } from '../../core/table-rules.js';
 import { useEffect, useRef, useState } from 'react';
 import { Seats } from '../Lobby';
 import { drawBoard } from './board';

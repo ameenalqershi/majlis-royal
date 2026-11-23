@@ -1,0 +1,363 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background: #453039;
+  color: #ffe9c4;
+}
+.felt {
+  border: 1px solid #875e44;
+  padding: 20px 26px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  color: #faebd5;
+  background:
+    radial-gradient(ellipse at 50% 53%, #733841cc, transparent 65%),
+    linear-gradient(120deg, #20171bfa, #49262bf5 49%, #271b20fa),
+    url('/marble.png') center/cover;
+  box-shadow:
+    inset 0 0 0 5px #351e23,
+    inset 0 0 0 6px #ae8e5959,
+    0 8px 24px #38291a24;
+}
+.feltTop,
+.handTitle,
+.turnBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.feltTop {
+  color: #e7d5b6;
+  font-size: 14px;
+}
+.feltTop span:first-child {
+  font: 550 18px Alexandria;
+}
+.playersRail {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0;
+}
+.playersRail li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #a28c6b66;
+  background: #291b20c4;
+  border-radius: 7px;
+  padding: 5px 10px;
+  min-width: 98px;
+}
+.playersRail .current {
+  border-color: #edcd8e;
+  background: #553c33;
+}
+.playersRail .out {
+  opacity: 0.55;
+}
+.playersRail .avatar {
+  background: #e2cb9e;
+  color: #3c2629;
+  font-size: 17px;
+}
+.playersRail strong,
+.playersRail small {
+  display: block;
+  line-height: 1.35;
+}
+.playersRail small {
+  color: #e1cfba;
+  font-size: 12px;
+}
+.piles {
+  direction: ltr;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  padding: 16px 0 21px;
+}
+.piles figure {
+  display: grid;
+  justify-items: center;
+  margin: 0;
+}
+.piles figcaption {
+  font-size: 13px;
+  margin-top: 10px;
+  color: #e5d7c8;
+}
+.stock,
+.face {
+  width: 105px;
+  height: 150px;
+  border-radius: 9px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  overflow: hidden;
+}
+.stock {
+  color: #f2ce94;
+  flex-direction: column;
+  transform: rotate(-6deg);
+  border: 3px solid #c5b38e;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 7px, #d5b86c20 7px 8px),
+    repeating-linear-gradient(-45deg, #362831 0 7px, #4c3840 7px 8px);
+  box-shadow:
+    2px 3px #a49a80,
+    4px 5px #57463c,
+    6px 7px #bcac8c,
+    8px 10px 12px #170b10;
+}
+.stock i {
+  font: 42px Georgia;
+}
+.stock small {
+  font: 650 17px Alexandria;
+}
+.ink-r {
+  --inkcard: #8b273a;
+  --edge: #e6a68e;
+}
+.ink-b {
+  --inkcard: #254763;
+  --edge: #a2cce9;
+}
+.ink-g {
+  --inkcard: #235b4d;
+  --edge: #b3d6b3;
+}
+.ink-y {
+  --inkcard: #78541c;
+  --edge: #ebca7d;
+}
+.ink-w {
+  --inkcard: #2a2534;
+  --edge: #e7c98f;
+}
+.face {
+  direction: ltr;
+  color: #fff2d3;
+  border: 2px solid var(--edge);
+  background: linear-gradient(135deg, #ffffff19, transparent 35%, #0003), var(--inkcard);
+  box-shadow:
+    inset 0 0 0 3px var(--inkcard),
+    inset 0 0 0 4px #ead6a659,
+    0 5px 8px #1b0b102e;
+}
+.face:before,
+.face:after {
+  content: '';
+  position: absolute;
+  width: 145%;
+  height: 74%;
+  border: 1px solid var(--edge);
+  border-radius: 50%;
+  transform: rotate(-53deg);
+  opacity: 0.46;
+  z-index: -1;
+}
+.face:after {
+  width: 133%;
+  height: 64%;
+  opacity: 0.26;
+}
+.index {
+  position: absolute;
+  left: 8%;
+  top: 4%;
+  font: bold 15px Georgia;
+}
+.pip {
+  font: italic bold 44px Georgia;
+  text-shadow: 0 2px #0004;
+}
+.faceName,
+.face small {
+  position: absolute;
+  inset-inline: 2px;
+  bottom: 18%;
+  text-align: center;
+  font: 700 12px/1.1 Tajawal;
+}
+.face small {
+  bottom: 7%;
+  font-size: 11px;
+}
+.turnBar {
+  border-top: 1px solid #c5a67265;
+  padding: 13px 0;
+}
+.turnBar strong {
+  font: 600 24px/1.5 Alexandria;
+}
+.handPanel {
+  margin-top: 14px;
+  padding: 18px 24px;
+  border: 1px solid var(--line);
+  background: #fffcf6;
+  border-radius: 8px;
+}
+.handTitle h2 {
+  margin: 0;
+  font-size: 26px;
+}
+.handTitle span {
+  color: #696859;
+}
+.mercyHand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 12px 0;
+  align-items: flex-start;
+}
+.handCard {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 7px;
+  transition: transform 0.15s;
+}
+.handCard .face {
+  width: 79px;
+  height: 114px;
+}
+.handCard .pip {
+  font-size: 32px;
+}
+.handCard .faceName {
+  font-size: 10px;
+}
+.handCard .face small {
+  font-size: 10px;
+}
+.handCard:not(:disabled):hover {
+  transform: translateY(-4px);
+}
+.handCard:disabled {
+  opacity: 0.67;
+}
+.previewCard {
+  float: left;
+  margin: 10px;
+}
+.previewCard .face {
+  width: 75px;
+  height: 108px;
+}
+.palette {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 10px 0;
+  border: 0;
+}
+.palette label {
+  position: relative;
+  cursor: pointer;
+}
+.palette input {
+  position: absolute;
+  opacity: 0;
+}
+.palette span {
+  display: block;
+  background: var(--inkcard);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 4px;
+}
+.palette input:checked + span,
+.palette input:focus-visible + span {
+  outline: 3px solid #d8b169;
+  outline-offset: 2px;
+}
+.callCheck {
+  display: block;
+  clear: both;
+  margin: 16px 0;
+}
+.history,
+.rules details {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.history summary,
+.rules summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+.history ol {
+  font-size: 14px;
+}
+@media (max-width: 740px) {
+  .felt {
+    padding: 16px 14px 0;
+  }
+  .playersRail {
+    gap: 5px;
+    margin: 12px 0;
+  }
+  .playersRail li {
+    min-width: 0;
+    padding: 4px 6px;
+  }
+  .playersRail .avatar {
+    width: 22px;
+    height: 22px;
+  }
+  .playersRail strong {
+    font-size: 14px;
+  }
+  .feltTop span:first-child {
+    font-size: 16px;
+  }
+  .turnBar {
+    align-items: start;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .turnBar strong {
+    font-size: 23px;
+  }
+  .piles {
+    padding: 7px 0 12px;
+    gap: 26px;
+  }
+  .piles .face,
+  .stock {
+    width: 80px;
+    height: 112px;
+  }
+  .handPanel {
+    padding: 14px;
+  }
+  .mercyHand {
+    gap: 6px;
+  }
+  .handCard .face {
+    width: 66px;
+    height: 94px;
+  }
+  .handCard .index {
+    font-size: 12px;
+  }
+  .handTitle h2 {
+    font-size: 23px;
+  }
+}

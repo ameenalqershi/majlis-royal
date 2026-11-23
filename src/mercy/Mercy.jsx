@@ -1,3 +1,4 @@
+import * as MercyCards from '../../core/mercy-cards.js';
 import { useState } from 'react';
 import { Dialog } from '../Dialog';
 

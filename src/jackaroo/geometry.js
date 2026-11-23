@@ -1,3 +1,4 @@
+import { TableRules } from '../../core/table-rules.js';
 // All sector coordinates start at the safety gate. Index zero in the game is
 // the next hole clockwise (base), so a complete lap branches at the gate.
 export function makeBoardGeometry(seats) {
