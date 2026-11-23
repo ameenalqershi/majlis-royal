@@ -66,11 +66,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
           mkdir -p build/published
           gh release download "$RELEASE_TAG" --pattern '*.apk' --dir build/published
           apks=(build/published/*.apk)
           test "${#apks[@]}" -eq 1
+          versioned_apk="majlis-${RELEASE_TAG#v}.apk"
+          test "$(basename "${apks[0]}")" = "$versioned_apk"
+          cmp "${apks[0]}" "downloads/$versioned_apk"
+          if [[ "$PRERELEASE" == "false" ]]; then
+            cmp "${apks[0]}" downloads/majlis-latest.apk
+          fi
           signer="$ANDROID_HOME/build-tools/35.0.0/apksigner"
           "$signer" verify --verbose "${apks[0]}"
           "$signer" verify --print-certs "${apks[0]}" | grep -F 'certificate SHA-256 digest: 6d7a0fbd81bf3b5c06545f49a6f82ac87aa8d2047a00e263249dd58e9405d1f3'
