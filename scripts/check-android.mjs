@@ -23,16 +23,25 @@ async function request(action, input = {}) {
 }
 
 async function waitForLounge() {
-  for (let attempt = 0; attempt < 30; attempt++) {
-    // The UI tree includes WebView content once React has rendered.
-    const dump = adb('shell', 'uiautomator', 'dump', '/sdcard/majlis-ui.xml');
-    if (dump.includes('dumped')) {
-      const ui = adb('shell', 'cat', '/sdcard/majlis-ui.xml');
-      if (ui.includes('العب أونو') && ui.includes('العب جاكارو')) return;
+  const deadline = Date.now() + 120_000;
+  let lastError;
+  while (Date.now() < deadline) {
+    try {
+      // The native server starts after the engine WebView loads. Wait for it
+      // before asking Android for the visible WebView's accessibility tree.
+      await request('network');
+      const dump = adb('shell', 'uiautomator', 'dump', '/sdcard/majlis-ui.xml');
+      if (dump.includes('dumped')) {
+        const ui = adb('shell', 'cat', '/sdcard/majlis-ui.xml');
+        if (ui.includes('العب أونو') && ui.includes('العب جاكارو')) return;
+      }
+    } catch (error) {
+      // The accessibility service can restart as WebView attaches.
+      lastError = error;
     }
     await delay(1000);
   }
-  throw new Error('The Android lounge did not display both games');
+  throw new Error('The Android lounge did not display both games', { cause: lastError });
 }
 
 async function exerciseTable(kind, capacity) {
